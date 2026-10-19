@@ -9,7 +9,7 @@ const cur = assets.find((a) => a.id === current);
 const href = (a: any) => route === 'history' ? (a.default ? `/${lang}/history/` : `/${lang}/history/${a.id}/`) : (a.default ? `/${lang}/` : `/${lang}/assets/${a.id}/`);
 ---
 <details class="apick"><summary aria-label={t(lang, 'picker.label')}><img src={`/coins/${cur.id}.svg`} alt="" width="26" height="26">{cur.symbol}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
-  <ul role="list">{assets.map((a) => <li><a href={href(a)} aria-current={a.id === current ? 'page' : undefined}><img src={`/coins/${a.id}.svg`} alt="" width="22" height="22"><span>{a.symbol}</span><small>{a.name}</small></a></li>)}</ul>
+  <ul role="list">{assets.map((a) => <li><a href={href(a)} aria-current={a.id === current ? 'page' : undefined}><img src={`/coins/${a.id}.svg`} alt="" width="22" height="22"><span>{a.symbol}</span>{a.name !== a.symbol && <small>{a.name}</small>}</a></li>)}</ul>
 </details>
 <style is:global>
   .apick { display: inline-block; position: relative; vertical-align: -0.12em; }
