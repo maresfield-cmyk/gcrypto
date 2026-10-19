@@ -17,7 +17,7 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
 ---
 <Layout lang={lang} title={t(lang, 'hub.title', { asset: A.symbol })} description={t(lang, 'hub.intro', { asset: A.symbol })} path={path} og={`/og/${asset}.png`}>
   <div class="hero">
-    <p class="eyebrow">{t(lang, 'nav.home')} · {t(lang, 'updated', { time: fmtTime(lang, F.generated_at) })}</p>
+    <p class="eyebrow">{t(lang, 'updated', { time: fmtTime(lang, F.generated_at) })}</p>
     <h1 aria-label={t(lang, 'hub.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} />{h1b}</h1>
     <p class="lead">{t(lang, 'hub.intro', { asset: A.symbol })}</p>
     {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
