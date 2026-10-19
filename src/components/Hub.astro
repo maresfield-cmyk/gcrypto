@@ -12,7 +12,7 @@ const L = (p: string) => `/${lang}${p}`;
 const combos = (amount: number) => Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, pct: (c.fee_usd / amount) * 100, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null }))).filter((x) => x.min_usd == null || x.min_usd <= amount).sort((a, b) => a.fee_usd - b.fee_usd).slice(0, 3);
 const [h1a, h1b] = t(lang, 'hub.h1', { asset: '\u0000' }).split('\u0000');
 const btc = asset === 'btc' ? A.networks.bitcoin : null;
-const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd).some((v: any) => typeof v === 'number')).slice(0, 2);
+const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd).filter((v: any) => typeof v === 'number').length >= 2).slice(0, 2);   // a card with a single line says nothing: hidden
 ---
 <Layout lang={lang} title={t(lang, 'hub.title', { asset: A.symbol })} description={t(lang, 'hub.intro', { asset: A.symbol })} path={path} og={`/og/${asset}.png`}>
   <div class="hero">

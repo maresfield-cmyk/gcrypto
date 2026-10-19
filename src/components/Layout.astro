@@ -91,7 +91,30 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   footer.bottom p { margin: 4px 0; max-width: 80ch; }
   .spark { width: 120px; height: 32px; display: block; margin-top: 8px; color: var(--accent); }
   dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; font-size: 14.5px; } dl.kv dt { color: var(--muted); min-width: 0; } dl.kv dd { margin: 0; text-align: end; white-space: nowrap; }
-  @media (max-width: 640px) { nav.main a { padding: 6px 9px; font-size: 13.5px; } .card .fee { font-size: 26px; } }
+  /* Phones: two cards per row, tighter spacing, a single scrolling line of navigation */
+  @media (max-width: 640px) {
+    header.top .wrap { min-height: 56px; padding-block: 8px; gap: 6px 12px; }
+    .brand { font-size: 15px; }
+    nav.main { flex-wrap: nowrap; overflow-x: auto; width: 100%; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    nav.main::-webkit-scrollbar { display: none; }
+    nav.main a { padding: 6px 10px; font-size: 13.5px; white-space: nowrap; }
+    main { padding-block: 18px 40px; }
+    .hero { padding-bottom: 14px; }
+    h1 { font-size: 27px; }
+    h2 { margin-top: 28px; }
+    p.lead { font-size: 15.5px; margin-bottom: 14px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .card { padding: 12px 13px; border-radius: 13px; }
+    .card .name { font-size: 12.5px; line-height: 1.25; }
+    .card .fee { font-size: 22px; margin: 4px 0 0; }
+    .card .sub { font-size: 11.5px; line-height: 1.35; }
+    .spark { width: 100%; height: 26px; margin-top: 6px; }
+    .two { gap: 10px; }
+    .note, .card { font-size: 14.5px; }
+    th, td { padding: 9px 10px; font-size: 13.5px; }
+    .scroll table { min-width: 560px; }
+    .asset-long { display: none; }
+  }
 </style>
 </head>
 <body>
