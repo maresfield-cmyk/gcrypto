@@ -27,7 +27,7 @@ if (due.length) {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, ALERT_EMAIL, ALERT_FROM } = process.env;
   if (SMTP_HOST && SMTP_USER && SMTP_PASS && ALERT_EMAIL) {
     const tr = nodemailer.createTransport({ host: SMTP_HOST, port: +(SMTP_PORT || 587), secure: +(SMTP_PORT || 587) === 465, auth: { user: SMTP_USER, pass: SMTP_PASS } });
-    await tr.sendMail({ from: ALERT_FROM || SMTP_USER, to: ALERT_EMAIL, subject: `[GulfCrypto] ${due.length === 1 ? due[0].subject : due.length + ' alerts'}`, text: due.map((d) => `${d.subject}\n${d.body}`).join('\n\n') + '\n\nhttps://crypto.gulfarcade.com/en/' });
+    await tr.sendMail({ from: ALERT_FROM || SMTP_USER, to: ALERT_EMAIL, subject: `[Fee Index] ${due.length === 1 ? due[0].subject : due.length + ' alerts'}`, text: due.map((d) => `${d.subject}\n${d.body}`).join('\n\n') + '\n\nhttps://crypto.gulfarcade.com/en/' });
     for (const d of due) state.sent[d.key] = now;
     console.log(`alert email sent: ${due.map((d) => d.subject).join('; ')}`);
   } else console.log(`alerts due but no SMTP settings (logged only): ${due.map((d) => d.subject).join('; ')}`);

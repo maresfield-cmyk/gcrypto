@@ -1,7 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { LANGS, t, networks, matrix, fmtUsd, fmtNum, cheapestNetwork } from '../../data';
+import { LANGS, t, networks, matrix, fmtUsd, fmtNum, fmtTime, cheapestNetwork } from '../../data';
 export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
 const { lang } = Astro.params;
 const N = networks(), M = matrix();
@@ -12,12 +12,15 @@ const btc = N.networks.bitcoin;
 const combos = (amount: number) => Object.entries(M.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, pct: (c.fee / amount) * 100, min: c.min }))).filter((x) => x.min == null || x.min <= amount).sort((a, b) => a.fee - b.fee).slice(0, 3);
 const L = (p: string) => `/${lang}${p}`;
 ---
-<Layout lang={lang} title={t(lang, 'hub.title')} description={t(lang, 'site.tagline')} path={L('/')} og="/og/hub.png" updated={N.generated_at}>
-  <h1>{t(lang, 'hub.h1')}</h1>
-  <p class="lead">{t(lang, 'hub.intro')}</p>
-  {best && <p class="best">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
+<Layout lang={lang} title={t(lang, 'hub.title')} description={t(lang, 'site.tagline')} path={L('/')} og="/og/hub.png">
+  <div class="hero">
+    <p class="eyebrow">{t(lang, 'nav.home')} · {t(lang, 'updated', { time: fmtTime(lang, N.generated_at) })}</p>
+    <h1>{t(lang, 'hub.h1')}</h1>
+    <p class="lead">{t(lang, 'hub.intro')}</p>
+    {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
+  </div>
   <div class="grid">
-    {sorted.map((n) => <a class="card" href={L(`/networks/${n.id}/`)} style="text-decoration:none;color:inherit">
+    {sorted.map((n, i) => <a class={'card' + (i === 0 ? ' rank-1' : '')} href={L(`/networks/${n.id}/`)} style="text-decoration:none;color:inherit">
       <div class="name">{n.name}</div>
       <div class="fee" data-live-fee={n.id}>{fmtUsd(lang, n.fee_usd)}</div>
       <div class="sub num">{fmtNum(lang, n.fee_native)} {n.native} · {t(lang, 'minutes', { n: n.eta_min })}{n.stale && <span class="stale"> · {t(lang, 'stale', { time: n.observed_at.slice(0, 16).replace('T', ' ') })}</span>}</div>

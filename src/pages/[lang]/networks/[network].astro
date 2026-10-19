@@ -11,6 +11,7 @@ const offers = Object.entries(M.exchanges).map(([id, e]: any) => ({ id, name: e.
 const skip = new Set(['note']);
 ---
 <Layout lang={lang} title={t(lang, 'net.title', { network: n.name })} description={`${n.name}: ${fmtUsd(lang, n.fee_usd)} per USDT transfer right now, how it is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/${network}.png`} updated={N.generated_at} crumbs={[{ name: n.name, path: L(`/networks/${network}/`) }]}>
+  <p class="eyebrow">{n.token} · {n.name}</p>
   <h1>{t(lang, 'net.h1', { network: n.name })}</h1>
   <div class="grid">
     <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={n.id}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
@@ -19,7 +20,7 @@ const skip = new Set(['note']);
   </div>
   {n.cases_usd && <div><h2>{t(lang, 'net.cases')}</h2><table><tbody>{Object.entries(n.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <tr><td>{t(lang, `case.${k}`)}</td><td class="num">{fmtUsd(lang, v)}</td></tr>)}</tbody></table></div>}
   <h2>{t(lang, 'net.how_made')}</h2>
-  <dl class="kv num">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'object' ? JSON.stringify(v) : String(v)}</dd></>)}</dl>
+  <dl class="kv num">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'number' ? fmtNum(lang, v) : typeof v === 'object' ? Object.entries(v).map(([kk, vv]: any) => `${kk}: ${typeof vv === 'number' ? fmtNum(lang, vv) : vv}`).join(' · ') : String(v)}</dd></>)}</dl>
   {n.breakdown.note && <p class="note">{n.breakdown.note}</p>}
   <p class="meta">{t(lang, 'source')}: {n.source}</p>
   <h2>{t(lang, 'net.chart7')}</h2>

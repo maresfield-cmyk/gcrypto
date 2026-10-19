@@ -1,4 +1,4 @@
-# GulfCrypto Fee & Transfer Index
+# Crypto Fee & Transfer Index
 
 Standalone data site for **crypto.gulfarcade.com**: what a USDT or BTC transfer costs right now on 8 networks, and what 9 exchanges charge to withdraw. Spec: `docs/SPEC.md`. How it runs and what to do each week: `docs/runbook.md`.
 

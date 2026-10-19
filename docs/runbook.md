@@ -1,4 +1,4 @@
-# Runbook: GulfCrypto Fee & Transfer Index
+# Runbook: Crypto Fee & Transfer Index
 
 Site: https://crypto.gulfarcade.com · Repo: `gcrypto` · Everything runs from GitHub Actions (`.github/workflows/update.yml`); every step also runs locally on a Mac.
 
