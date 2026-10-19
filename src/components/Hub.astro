@@ -30,7 +30,7 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
     </a>)}
   </div>
   <div class="two" style="margin-top:20px">
-    <div class="note"><strong>{t(lang, 'wallet_vs_exchange.title')}</strong><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.wallet')}</p><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.exchange')}</p></div>
+    <div class="note"><strong>{t(lang, 'wallet_vs_exchange.title')}</strong><p style="margin:6px 0 0"><strong>{t(lang, 'wallet_vs_exchange.wallet_lead')}</strong> {t(lang, 'wallet_vs_exchange.wallet')}</p><p style="margin:6px 0 0"><strong>{t(lang, 'wallet_vs_exchange.exchange_lead')}</strong> {t(lang, 'wallet_vs_exchange.exchange')}</p></div>
     {btc ? <div class="card"><div class="name">{t(lang, 'hub.btc_title')}</div><div class="sub">{t(lang, 'hub.btc_intro', { vbytes: btc.breakdown.tx_vbytes })}</div>
       <dl class="kv num" style="margin-top:8px"><dt>{t(lang, 'hub.btc_fastest')}</dt><dd>{fmtUsd(lang, btc.cases_usd.fastest_btc)}</dd><dt>{t(lang, 'hub.btc_half_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.half_hour_btc)}</dd><dt>{t(lang, 'hub.btc_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.hour_btc)}</dd><dt>{t(lang, 'hub.btc_economy')}</dt><dd>{fmtUsd(lang, btc.cases_usd.economy_btc)}</dd></dl></div>
     : showCases.map((c) => <div class="card"><div class="name">{t(lang, 'hub.cases_title', { asset: A.symbol, network: c.name })}</div>
