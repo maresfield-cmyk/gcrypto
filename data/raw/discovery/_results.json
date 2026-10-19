@@ -1,0 +1,623 @@
+{
+ "ran_at": "2026-10-19T17:41:30.730Z",
+ "results": [
+  {
+   "id": "tron.chainparameters",
+   "url": "https://api.trongrid.io/wallet/getchainparameters",
+   "keyNeeded": "no",
+   "note": "energy price (sun) + bandwidth price; free, optional TRON-PRO-API-KEY raises limits",
+   "ok": true,
+   "status": 200,
+   "ms": 354,
+   "sample": "{\"chainParameter\": [{\"key\": \"getMaintenanceTimeInterval\",\"value\": 21600000},{\"key\": \"getAccountUpgradeCost\",\"value\": 9999000000},{\"key\": \"getCreateAccountFee\",\"value\": 100000},{\"key\": \"getTransactionFee\",\"value\": 1000},{\"key\": \"getAssetIssueFee\",\"value\": 1024000000},{\"key\": \"getWitnessPayPerBlock\",\"value\": 8000000},{\"key\": \"getWitnessStandbyAllowance\",\"value\": 115200000000},{\"key\": \"getCreateNewAccountFeeInSystemContract\",\"value\": 1000000},{\"key\": \"getCreateNewAccountBandwidthRate\",\"value\": 1},{\"key\": \"getAllowCreationOfContracts\",\"value\": 1},{\"key\": \"getRemoveThePowerOfTheGr\",\"value\": -1},{\"key\": \"getEnergyFee\",\"value\": 100},{\"key\": \"getExchangeCreateFee\",\"value\": 1024000000},{\"key\": \"getMa …",
+   "extracted": {
+    "getCreateAccountFee": 100000,
+    "getTransactionFee": 1000,
+    "getCreateNewAccountFeeInSystemContract": 1000000,
+    "getEnergyFee": 100
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "tron.energy.existing",
+   "url": "https://api.trongrid.io/wallet/triggerconstantcontract",
+   "keyNeeded": "no",
+   "note": "energy a 100 USDT transfer would use (existing vs never-funded recipient)",
+   "ok": true,
+   "status": 200,
+   "ms": 113,
+   "sample": "{\"transaction\":{\"raw_data\":{\"ref_block_bytes\":\"5f80\",\"ref_block_hash\":\"45b93db5f2647a29\",\"expiration\":1792431738000,\"contract\":[{\"parameter\":{\"value\":{\"owner_address\":\"TV6MuMXfmLbBqPZvBHdwFsDnQeVfnmiuSi\",\"contract_address\":\"TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t\",\"data\":\"a9059cbb0000000000000000000000000583a68a3bcd86c25ab1bee482bac04a216b02610000000000000000000000000000000000000000000000000000000005f5e100\"},\"type_url\":\"type.googleapis.com/protocol.TriggerSmartContract\"},\"type\":\"TriggerSmartContract\"}],\"timestamp\":1792431680548},\"ret\":[{}],\"raw_data_hex\":\"0a025f80220845b93db5f2647a2940909987aa95345aae01081f12a9010a31747970652e676f6f676c65617069732e636f6d2f70726f746f636f6c2e54726967676572536d61727 …",
+   "extracted": {
+    "energy_used": 64285,
+    "energy_penalty": 49635,
+    "result": true
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "tron.energy.new",
+   "url": "https://api.trongrid.io/wallet/triggerconstantcontract",
+   "keyNeeded": "no",
+   "note": "energy a 100 USDT transfer would use (existing vs never-funded recipient)",
+   "ok": false,
+   "status": 429,
+   "ms": 45,
+   "sample": "{\"Error\":\"request rate exceeded the allowed_rps(3), and the query server is suspended for 5 s. To obtain higher request quotas and a more stable service, it is recommended to authenticate with an API Key. Please refer to the documentation: https:\\/\\/developers.tron.network\\/reference\\/select-network#how-to-get-an-api-key\"} ",
+   "extracted": {},
+   "rate": {
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "tron.tronscan.chainparams",
+   "url": "https://apilist.tronscanapi.com/api/chainparameters",
+   "keyNeeded": "no",
+   "note": "alternative source for the same parameters",
+   "ok": false,
+   "status": 429,
+   "ms": 494,
+   "sample": "{\"Error\":\"request rate exceeded the allowed_rps(3), and the query server is suspended for 94 s. To obtain higher request quotas and a more stable service, it is recommended to authenticate with an API Key. Please refer to the documentation: https:\\/\\/docs.tronscan.org\\/#get-an-api-key\"} ",
+   "extracted": 1,
+   "rate": {
+    "cf-ray": "a4d192b499872a5a-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "eth.gasPrice",
+   "url": "https://ethereum-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "public RPC, no key",
+   "ok": true,
+   "status": 200,
+   "ms": 155,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x95e6603\"}",
+   "extracted": {
+    "gwei": 0.157181443
+   },
+   "rate": {
+    "cf-ray": "a4d192b7b9af1f72-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "eth.feeHistory",
+   "url": "https://ethereum-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "",
+   "ok": true,
+   "status": 200,
+   "ms": 65,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"oldestBlock\":\"0x19035d2\",\"reward\":[[\"0x989680\",\"0x8ad4d9b\",\"0x1dcd6500\"],[\"0xf4240\",\"0x5f5e100\",\"0x3b9aca00\"],[\"0xf3d\",\"0x989680\",\"0x23c34600\"],[\"0x2c6497\",\"0x2faf081\",\"0x23c34600\"],[\"0x4d0fc2\",\"0x5f5e100\",\"0x29ea4031\"]],\"baseFeePerGas\":[\"0x9d1ed86\",\"0x98509fc\",\"0x8c8162c\",\"0x9ab574b\",\"0x95e56c6\",\"0x968abaf\"],\"gasUsedRatio\":[0.37765945,0.18986561666666665,0.90435165,0.3755694,0.5172314166666667],\"baseFeePerBlobGas\":[\"0x98dcb5\",\"0x9b2a65\",\"0x8c43ee\",\"0x8ffc31\",\"0x9227a3\",\"0x9b2a63\"],\"blobGasUsedRatio\":[0.19047619047619047,0.23809523809523808,0.3333333333333333,0.19047619047619047,0.7619047619047619]}}",
+   "extracted": {
+    "baseFeeGwei": 0.157854639,
+    "p50PriorityGwei": 0.1
+   },
+   "rate": {
+    "cf-ray": "a4d192b83ab11f72-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "eth.usdtTransferGas",
+   "url": "https://ethereum-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "estimateGas for a 100 USDT ERC-20 transfer from Binance hot wallet to a funded address",
+   "ok": true,
+   "status": 200,
+   "ms": 64,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0xb58f\"}",
+   "extracted": {
+    "gas": 46479
+   },
+   "rate": {
+    "cf-ray": "a4d192b8ab9e1f72-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "sol.priorityFees",
+   "url": "https://api.mainnet-beta.solana.com",
+   "keyNeeded": "no",
+   "note": "public RPC; USDT mint; base fee is 5000 lamports/signature",
+   "ok": true,
+   "status": 200,
+   "ms": 221,
+   "sample": "{\"jsonrpc\":\"2.0\",\"result\":[{\"prioritizationFee\":0,\"slot\":458919721},{\"prioritizationFee\":0,\"slot\":458919722},{\"prioritizationFee\":150000,\"slot\":458919723},{\"prioritizationFee\":0,\"slot\":458919724},{\"prioritizationFee\":0,\"slot\":458919725},{\"prioritizationFee\":0,\"slot\":458919726},{\"prioritizationFee\":0,\"slot\":458919727},{\"prioritizationFee\":0,\"slot\":458919728},{\"prioritizationFee\":0,\"slot\":458919729},{\"prioritizationFee\":0,\"slot\":458919730},{\"prioritizationFee\":0,\"slot\":458919731},{\"prioritizationFee\":0,\"slot\":458919732},{\"prioritizationFee\":0,\"slot\":458919733},{\"prioritizationFee\":0,\"slot\":458919734},{\"prioritizationFee\":0,\"slot\":458919735},{\"prioritizationFee\":0,\"slot\":458919736},{\"prioritiza …",
+   "extracted": {
+    "samples": 150,
+    "p50_microLamportsPerCU": 0,
+    "max": 468750
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "sol.rentTokenAccount",
+   "url": "https://api.mainnet-beta.solana.com",
+   "keyNeeded": "no",
+   "note": "rent for a new token account (165 bytes)",
+   "ok": true,
+   "status": 200,
+   "ms": 55,
+   "sample": "{\"jsonrpc\":\"2.0\",\"result\":1488440,\"id\":1} ",
+   "extracted": {
+    "lamports": 1488440,
+    "sol": 0.00148844
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "bsc.gasPrice",
+   "url": "https://bsc-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "",
+   "ok": true,
+   "status": 200,
+   "ms": 157,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x2faf080\"}",
+   "extracted": {
+    "gwei": 0.05
+   },
+   "rate": {
+    "cf-ray": "a4d192bb4ada0325-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "polygon.gasPrice",
+   "url": "https://polygon-bor-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "",
+   "ok": true,
+   "status": 200,
+   "ms": 137,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x2a042b568e\"} ",
+   "extracted": {
+    "gwei": 180.458575502
+   },
+   "rate": {
+    "cf-ray": "a4d192bc4a35026a-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "polygon.feeHistory",
+   "url": "https://polygon-bor-rpc.publicnode.com",
+   "keyNeeded": "no",
+   "note": "",
+   "ok": true,
+   "status": 200,
+   "ms": 61,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"oldestBlock\":\"0x5b60f50\",\"reward\":[[\"0x1176592e00\"],[\"0x1176592e00\"],[\"0x1176592e00\"],[\"0x1176592e00\"],[\"0x1176592e00\"]],\"baseFeePerGas\":[\"0x23be16ba5b\",\"0x240ab7542b\",\"0x23af6945c2\",\"0x244c809d11\",\"0x24320d9c8e\",\"0x23c39dd03f\"],\"gasUsedRatio\":[0.230395125,0.2383384625,0.130290675,0.12267554375,0.1541937375],\"baseFeePerBlobGas\":[\"0x0\",\"0x0\",\"0x0\",\"0x0\",\"0x0\",\"0x0\"],\"blobGasUsedRatio\":[0,0,0,0,0]}} ",
+   "extracted": {
+    "baseFeeGwei": 153.605754943,
+    "p50PriorityGwei": 75
+   },
+   "rate": {
+    "cf-ray": "a4d192bcab5c026a-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "arb.gasPrice",
+   "url": "https://arb1.arbitrum.io/rpc",
+   "keyNeeded": "no",
+   "note": "Arbitrum official public RPC",
+   "ok": true,
+   "status": 200,
+   "ms": 202,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x131a230\"} ",
+   "extracted": {
+    "gwei": 0.02003
+   },
+   "rate": {
+    "cf-ray": "a4d192bd9e722729-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "arb.usdtTransferGas",
+   "url": "https://arb1.arbitrum.io/rpc",
+   "keyNeeded": "no",
+   "note": "estimateGas on Arbitrum already includes the L1 data component",
+   "ok": true,
+   "status": 200,
+   "ms": 122,
+   "sample": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0xb09e\"} ",
+   "extracted": {
+    "gas": 45214
+   },
+   "rate": {
+    "cf-ray": "a4d192be585f2729-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "ton.config",
+   "url": "https://tonapi.io/v2/blockchain/config",
+   "keyNeeded": "no",
+   "note": "tonapi public (rate limited without key, ~1 rps)",
+   "ok": true,
+   "status": 200,
+   "ms": 172,
+   "sample": "{\"raw\":\"b5ee9c720203088b0001000001401b0000014055555555555555555555555555555555555555555555555555555555555555550001020120000200030202d8000400050202f50006000702012000150016020162081808190203a0320008000902027608580859010120000a01012000140100000b0114ff00f4a413f4bcf2c80b000c020120000d000e020148083108320202f1000f001001cd0c3b51343534c7f4fffd01346008200914d47d1a9c085ba49b08638dc8740835d27089e38a74c1f5c2c7fe08eec07004ac2385cc2008961459bd1b9515487d1b8c200910057d168c00dfe49b0878a4c4d7c0f8b8a3a0b6cf37c0f23304b2c7f2fffd00327b5520001103f720c235c60834c7f4c7f4c7c07e08ee7c98c835d920c1af3c99fb51343534c7f4fffd01345454aebca8416084159bdd196ea3d1c0b4c3f4fff44876cf0c34c1c06037ec3014fcaa74c7c0608423a049e2aebcaa74ff …",
+   "extracted": {
+    "keys": [
+     "0",
+     "1",
+     "2",
+     "4",
+     "5",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "rate": {
+    "cf-ray": "a4d192bf9c7d2dd2-MAD",
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "ton.toncenter.config",
+   "url": "https://toncenter.com/api/v2/getConfigParam?config_id=25",
+   "keyNeeded": "no",
+   "note": "toncenter public: gas/fwd price config (key optional, 1 rps without)",
+   "ok": true,
+   "status": 200,
+   "ms": 148,
+   "sample": "{\"ok\":true,\"result\":{\"@type\":\"configInfo\",\"config\":{\"@type\":\"tvm.cell\",\"bytes\":\"te6cckEBAQEAIwAAQuoAAAAAAAEEawAAAAAAQqqrAAAAABoKqqsAAYAAVVVVVXUQ/H0=\"}},\"@extra\":\"1792431682:1:11.522\"}",
+   "extracted": {
+    "ok": true,
+    "type": "tvm.cell"
+   },
+   "rate": {
+    "cf-ray": "a4d192c0fc660327-MAD",
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "ton.usdtJettonTx",
+   "url": "https://tonapi.io/v2/blockchain/accounts/EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs/transactions?limit=3",
+   "keyNeeded": "no",
+   "note": "recent USDT jetton master txs: see real total_fees for a jetton transfer",
+   "ok": true,
+   "status": 200,
+   "ms": 51,
+   "sample": "{\"transactions\":[{\"hash\":\"5a7f42c3468bb9b407ed5595f2e9440b5a623d36dc8b4d4f51a7bf1c8c640646\",\"lt\":111036547000019,\"account\":{\"address\":\"0:b113a994b5024a16719f69139328eb759596c38a25f59028b146fecdc3621dfe\",\"name\":\"Tether USD\",\"is_scam\":false,\"is_wallet\":false},\"success\":true,\"utime\":1792431589,\"orig_status\":\"active\",\"end_status\":\"active\",\"total_fees\":449269,\"end_balance\":1071874973468,\"transaction_type\":\"TransOrd\",\"state_update_old\":\"635301b2c142b2903d3fcc4d402dcdfab5faeb74e028ae5984f0fa452de1c940\",\"state_update_new\":\"7673749fb80cf5adca964d59cadcb9b0d2d43e337acf932f776dc76f9ab78e6b\",\"in_msg\":{\"msg_type\":\"int_msg\",\"created_lt\":111036547000018,\"ihr_disabled\":true,\"bounce\":false,\"bounced\":false,\"v …",
+   "extracted": {
+    "txs": 3,
+    "total_fees_nanoton": [
+     449269,
+     495219,
+     449322
+    ]
+   },
+   "rate": {
+    "cf-ray": "a4d192c168dd2dd2-MAD",
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "btc.fees",
+   "url": "https://mempool.space/api/v1/fees/recommended",
+   "keyNeeded": "no",
+   "note": "mempool.space free, no key",
+   "ok": true,
+   "status": 200,
+   "ms": 161,
+   "sample": "{\"fastestFee\":3,\"halfHourFee\":3,\"hourFee\":1,\"economyFee\":1,\"minimumFee\":1}",
+   "extracted": {
+    "fastestFee": 3,
+    "halfHourFee": 3,
+    "hourFee": 1,
+    "economyFee": 1,
+    "minimumFee": 1
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "btc.mempoolBlocks",
+   "url": "https://mempool.space/api/v1/fees/mempool-blocks",
+   "keyNeeded": "no",
+   "note": "",
+   "ok": true,
+   "status": 200,
+   "ms": 55,
+   "sample": "[{\"blockSize\":1479232,\"blockVSize\":997974.25,\"nTx\":3304,\"totalFees\":3252298,\"medianFee\":2.021154495330258,\"feeRange\":[1.997179125528914,2.00711743772242,2.010498687664042,2.1368267831149925,3.4519427402862988,4.542269611576542,903.1802120141343]},{\"blockSize\":1631956,\"blockVSize\":997929.25,\"nTx\":2240,\"totalFees\":1284220,\"medianFee\":1.15530665552967,\"feeRange\":[1.0034843205574913,1.0048076923076923,1.0134025075659316,1.2049910873440286,1.694267515923567,1.880095923261391,2]},{\"blockSize\":1497708,\"blockVSize\":997974,\"nTx\":4086,\"totalFees\":501606,\"medianFee\":0.2200137258819748,\"feeRange\":[0.136,0.13935764833968428,0.13935764833968428,0.13935764833968428,0.14187010594196223,0.15020502122149484,1 …",
+   "extracted": {
+    "blocks": 8,
+    "nextMedianFee": 2.021154495330258
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "price.coingecko",
+   "url": "https://api.coingecko.com/api/v3/simple/price?ids=tron,ethereum,solana,binancecoin,polygon-ecosystem-token,the-open-network,bitcoin,tether&vs_currencies=usd&include_last_updated_at=true",
+   "keyNeeded": "no",
+   "note": "free tier: ~30 calls/min, no key (demo key optional)",
+   "ok": true,
+   "status": 200,
+   "ms": 258,
+   "sample": "{\"tron\":{\"usd\":0.330915,\"last_updated_at\":1792431671},\"ethereum\":{\"usd\":2397.14,\"last_updated_at\":1792431655},\"solana\":{\"usd\":104.02,\"last_updated_at\":1792431655},\"binancecoin\":{\"usd\":726.52,\"last_updated_at\":1792431655},\"polygon-ecosystem-token\":{\"usd\":0.092135,\"last_updated_at\":1792431655},\"the-open-network\":{\"usd\":1.35,\"last_updated_at\":1792431655},\"bitcoin\":{\"usd\":81865,\"last_updated_at\":1792431671},\"tether\":{\"usd\":0.999349,\"last_updated_at\":1792431655}}",
+   "extracted": {
+    "tron": 0.330915,
+    "ethereum": 2397.14,
+    "solana": 104.02,
+    "binancecoin": 726.52,
+    "polygon-ecosystem-token": 0.092135,
+    "the-open-network": 1.35,
+    "bitcoin": 81865,
+    "tether": 0.999349
+   },
+   "rate": {
+    "cf-ray": "a4d192c39f7fb6ba-MAD",
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "price.binanceTicker",
+   "url": "https://api.binance.com/api/v3/ticker/price?symbols=[\"TRXUSDT\",\"ETHUSDT\",\"SOLUSDT\",\"BNBUSDT\",\"POLUSDT\",\"TONUSDT\",\"BTCUSDT\"]",
+   "keyNeeded": "no",
+   "note": "exchange public ticker, no key: fallback price source",
+   "ok": true,
+   "status": 200,
+   "ms": 417,
+   "sample": "[{\"symbol\":\"BTCUSDT\",\"price\":\"81934.81000000\"},{\"symbol\":\"ETHUSDT\",\"price\":\"2399.57000000\"},{\"symbol\":\"BNBUSDT\",\"price\":\"727.12000000\"},{\"symbol\":\"TRXUSDT\",\"price\":\"0.33120000\"},{\"symbol\":\"SOLUSDT\",\"price\":\"104.08000000\"},{\"symbol\":\"TONUSDT\",\"price\":\"1.60000000\"},{\"symbol\":\"POLUSDT\",\"price\":\"0.09217000\"}]",
+   "extracted": {
+    "BTCUSDT": 81934.81,
+    "ETHUSDT": 2399.57,
+    "BNBUSDT": 727.12,
+    "TRXUSDT": 0.3312,
+    "SOLUSDT": 104.08,
+    "TONUSDT": 1.6,
+    "POLUSDT": 0.09217
+   },
+   "rate": {
+    "x-mbx-used-weight-1m": "4",
+    "content-type": "application/json;charset=UTF-8"
+   }
+  },
+  {
+   "id": "price.okxTicker",
+   "url": "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
+   "keyNeeded": "no",
+   "note": "second fallback",
+   "ok": true,
+   "status": 200,
+   "ms": 348,
+   "sample": "{\"code\":\"0\",\"data\":[{\"instType\":\"SPOT\",\"instId\":\"PEOPLE-EUR\",\"last\":\"0.006789\",\"lastSz\":\"21111.985313\",\"askPx\":\"0.006695\",\"askSz\":\"100133.710617\",\"bidPx\":\"0.006667\",\"bidSz\":\"100555.255758\",\"open24h\":\"0.006497\",\"high24h\":\"0.006789\",\"low24h\":\"0.006324\",\"volCcy24h\":\"2434.714737931741\",\"vol24h\":\"369046.329891\",\"ts\":\"1792431683065\",\"sodUtc0\":\"0.006774\",\"sodUtc8\":\"0.006789\"},{\"instType\":\"SPOT\",\"instId\":\"XASTS-USDT\",\"last\":\"43.03\",\"lastSz\":\"0.46339\",\"askPx\":\"43.04\",\"askSz\":\"23.2592\",\"bidPx\":\"42.97\",\"bidSz\":\"11.64702\",\"open24h\":\"39.87\",\"high24h\":\"43.72\",\"low24h\":\"39.71\",\"volCcy24h\":\"144337.3409638\",\"vol24h\":\"3418.79736\",\"ts\":\"1792431683271\",\"sodUtc0\":\"40.9\",\"sodUtc8\":\"43.5\"},{\"instType\":\"SPOT\",\"inst …",
+   "extracted": {
+    "count": 1184,
+    "trx": "0.33114"
+   },
+   "rate": {
+    "cf-ray": "a4d192c7eb97f773-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "binance.withdrawFees",
+   "url": "https://api.binance.com/sapi/v1/capital/config/getall",
+   "keyNeeded": "yes (read-only key, signed request)",
+   "note": "expect 401 without key: proves the endpoint exists",
+   "ok": false,
+   "status": 400,
+   "ms": 272,
+   "sample": "{\"code\":-2014,\"msg\":\"API-key format invalid.\"}",
+   "extracted": {
+    "code": -2014,
+    "msg": "API-key format invalid."
+   },
+   "rate": {
+    "content-type": "application/json;charset=UTF-8"
+   }
+  },
+  {
+   "id": "bybit.coinInfo",
+   "url": "https://api.bybit.com/v5/asset/coin/query-info?coin=USDT",
+   "keyNeeded": "yes (read-only key)",
+   "note": "expect retCode 10003/10004 without key",
+   "ok": true,
+   "status": 200,
+   "ms": 349,
+   "sample": "{\"retCode\":10001,\"retMsg\":\"Request parameter error: apiKey is missing\",\"result\":{},\"retExtInfo\":{},\"time\":1792431684834}",
+   "extracted": {
+    "retCode": 10001,
+    "retMsg": "Request parameter error: apiKey is missing"
+   },
+   "rate": {
+    "content-type": "application/json; charset=utf-8"
+   }
+  },
+  {
+   "id": "okx.currencies",
+   "url": "https://www.okx.com/api/v5/asset/currencies?ccy=USDT",
+   "keyNeeded": "yes (read-only key + passphrase)",
+   "note": "expect code 50103/50111 without key",
+   "ok": false,
+   "status": 401,
+   "ms": 212,
+   "sample": "{\"msg\":\"Request header OK-ACCESS-KEY can not be empty.\",\"code\":\"50103\"}",
+   "extracted": {
+    "code": "50103",
+    "msg": "Request header OK-ACCESS-KEY can not be empty."
+   },
+   "rate": {
+    "cf-ray": "a4d192cefc45f773-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "kucoin.currencies",
+   "url": "https://api.kucoin.com/api/v3/currencies/USDT",
+   "keyNeeded": "no",
+   "note": "public",
+   "ok": true,
+   "status": 200,
+   "ms": 361,
+   "sample": "{\"code\":\"200000\",\"data\":{\"currency\":\"USDT\",\"name\":\"USDT\",\"fullName\":\"Tether\",\"precision\":8,\"confirms\":null,\"contractAddress\":null,\"isMarginEnabled\":true,\"isDebitEnabled\":true,\"chains\":[{\"chainName\":\"APT\",\"chainId\":\"aptos\",\"withdrawalMinSize\":\"1\",\"withdrawMinSize\":\"1\",\"depositMinSize\":null,\"withdrawFeeRate\":\"0\",\"withdrawalMinFee\":\"0.5\",\"withdrawMinFee\":\"0.5\",\"isWithdrawEnabled\":true,\"isDepositEnabled\":true,\"confirms\":1,\"preConfirms\":1,\"contractAddress\":\"0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b\",\"withdrawPrecision\":6,\"maxWithdraw\":null,\"maxDeposit\":null,\"needTag\":false,\"addressRegex\":\"^(0x)[0-9a-f]{64}$\",\"memoRegex\":\"\"},{\"chainName\":\"Asset Hub(Polkadot)\",\"chainId\":\"st …",
+   "extracted": {
+    "chains": [
+     "APT:0.5/min 1",
+     "Asset Hub(Polkadot):1/min 10",
+     "OPTIMISM:1/min 3",
+     "TON:0.5/min 1",
+     "KCC:0.5/min 1",
+     "SOL:1.5/min 3",
+     "TON:0.5/min 1",
+     "BEP20:1/min 10",
+     "CFX:1/min 2",
+     "Stable:1/min 2",
+     "KAVA EVM Co-Chain:1/min 3",
+     "Polygon POS:0.8/min 1.6",
+     "ERC20:5.5/min 30",
+     "AVAX C-Chain:1/min 2",
+     "NEAR:0.5/min 3",
+     "TRC20:1.99/min 4",
+     "PLASMA:0.4/min 5",
+     "XTZ:1/min 2",
+     "ARBITRUM:1/min 5"
+    ]
+   },
+   "rate": {
+    "cf-ray": "a4d192d0c8eff771-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "bitget.coins",
+   "url": "https://api.bitget.com/api/v2/spot/public/coins?coin=USDT",
+   "keyNeeded": "no",
+   "note": "public",
+   "ok": true,
+   "status": 200,
+   "ms": 402,
+   "sample": "{\"code\":\"00000\",\"msg\":\"success\",\"requestTime\":1792431685783,\"data\":[{\"coinId\":\"2\",\"coin\":\"USDT\",\"transfer\":\"true\",\"chains\":[{\"chain\":\"ERC20\",\"needTag\":\"false\",\"withdrawable\":\"true\",\"rechargeable\":\"true\",\"withdrawFee\":\"2\",\"extraWithdrawFee\":\"0\",\"depositConfirm\":\"12\",\"withdrawConfirm\":\"96\",\"minDepositAmount\":\"0.5\",\"minWithdrawAmount\":\"5\",\"browserUrl\":\"https://etherscan.io/tx/\",\"contractAddress\":\"0xdac17f958d2ee523a2206206994597c13d831ec7\",\"withdrawStep\":\"0\",\"withdrawMinScale\":\"6\",\"congestion\":\"normal\"},{\"chain\":\"TRC20\",\"needTag\":\"false\",\"withdrawable\":\"true\",\"rechargeable\":\"true\",\"withdrawFee\":\"1.5\",\"extraWithdrawFee\":\"0\",\"depositConfirm\":\"3\",\"withdrawConfirm\":\"3\",\"minDepositAmount\":\"0.01\",\"mi …",
+   "extracted": {
+    "chains": [
+     "ERC20:2/min 5",
+     "TRC20:1.5/min 5",
+     "BEP20:0.01/min 5",
+     "ArbitrumOne:0.1/min 5",
+     "SOL:0.5/min 5",
+     "Optimism:0.014/min 5",
+     "Polygon:0.07/min 5",
+     "AVAXC-Chain:0.04/min 5",
+     "TON:0.15/min 5",
+     "Aptos:0.03/min 5",
+     "Morph:0.01/min 5",
+     "Plasma:0.012/min 5"
+    ]
+   },
+   "rate": {
+    "cf-ray": "a4d192d35c0ff448-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "cryptocom.currencyNetworks",
+   "url": "https://api.crypto.com/exchange/v1/public/get-currency-networks",
+   "keyNeeded": "no",
+   "note": "Crypto.com Exchange: documented as needing auth in some versions; check",
+   "ok": false,
+   "status": 404,
+   "ms": 440,
+   "sample": "{ \"timestamp\" : \"2026-10-19T17:41:26.181+00:00\", \"status\" : 404, \"error\" : \"Not Found\", \"path\" : \"/v1/public/get-currency-networks\" }",
+   "extracted": {
+    "keys": null
+   },
+   "rate": {
+    "cf-ray": "a4d192d59c9638dc-MAD",
+    "content-type": "application/json"
+   }
+  },
+  {
+   "id": "cryptocom.feePage",
+   "url": "https://crypto.com/exchange/fees",
+   "keyNeeded": "no",
+   "note": "fee page (manual fallback)",
+   "ok": true,
+   "status": 200,
+   "ms": 1332,
+   "sample": "<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"UTF-8\" /> <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0, user-scalable=no\" /> <link rel=\"icon\" href=\"/exchange/favicon.png\" /> <link rel=\"preconnect\" href=\"https://static2.crypto.com\"> <link rel=\"preconnect\" href=\"https://exchange-nts.crypto.com\"> <link rel=\"preconnect\" href=\"https://exchange-be.crypto.com\"> <link rel=\"preconnect\" href=\"https://exchange-fe.crypto.com\"> <link rel=\"preconnect\" href=\"https://exchange-rest-gateway.x.crypto.com\"> <meta name=\"keywords\" content=\"Blockchain Crypto Exchange, Cryptocurrency Exchange, Bitcoin Trading, CRO, BTC\" /> <meta name=\"description\" content=\"Trade crypto anytime, anywher …",
+   "extracted": {
+    "html": 5373,
+    "mentionsUSDT": false
+   },
+   "rate": {
+    "cf-ray": "a4d192d85c89ec93-MAD",
+    "content-type": "text/html"
+   }
+  },
+  {
+   "id": "rain.feePage",
+   "url": "https://www.rain.com/fees",
+   "keyNeeded": "no",
+   "note": "Rain (Bahrain/UAE): manual sheet likely",
+   "ok": false,
+   "status": 404,
+   "ms": 207,
+   "sample": "<!doctype html><html translate=\"no\" class=\"light-theme\" lang=\"en\" dir=\"ltr\"><head><meta charset=\"utf-8\"/><link rel=\"manifest\" href=\"/manifest.webmanifest\"/><link rel=\"describedby\" href=\"/llms.txt\" type=\"text/markdown\"/><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"32x32\"/><link rel=\"icon\" href=\"/icon.svg\" type=\"image/svg+xml\"/><link rel=\"apple-touch-icon\" href=\"/apple-touch-icon_180x180.png\"/><link rel=\"preload\" as=\"script\" href=\"/static/container-web/5934c4f04d46e91116d7c034b890ee0369880f75/main.3354f55489f66f452816.js\"/><script id=\"main-entrypoint\" src=\"/static/container-web/5934c4f04d46e91116d7c034b890ee0369880f75/main.3354f55489f66f452816.js\" data-api=\"86,90,71,94,66,36,81,36,120,113,53,94 …",
+   "extracted": {
+    "html": 21190,
+    "mentionsUSDT": false,
+    "mentionsFee": true
+   },
+   "rate": {
+    "cf-ray": "a4d192e0ba55d862-MAD",
+    "content-type": "text/html"
+   }
+  },
+  {
+   "id": "bitoasis.feePage",
+   "url": "https://bitoasis.net/en/fees",
+   "keyNeeded": "no",
+   "note": "BitOasis (UAE): manual sheet likely",
+   "ok": false,
+   "status": 403,
+   "ms": 186,
+   "sample": "<!DOCTYPE html> <!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]--> <!--[if IE 7]> <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]--> <!--[if IE 8]> <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]--> <!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]--> <head> <title>Attention Required! | Cloudflare</title> <meta charset=\"UTF-8\" /> <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" /> <meta name=\"robots\" content=\"noindex, nofollow\" /> <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" /> <link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/ …",
+   "extracted": {
+    "html": 4573,
+    "mentionsUSDT": false,
+    "mentionsFee": false
+   },
+   "rate": {
+    "cf-ray": "a4d192e2fd808ddd-MAD",
+    "content-type": "text/html; charset=UTF-8"
+   }
+  },
+  {
+   "id": "coinmena.feePage",
+   "url": "https://www.coinmena.com/fees",
+   "keyNeeded": "no",
+   "note": "CoinMENA (Bahrain): manual sheet likely",
+   "ok": true,
+   "status": 200,
+   "ms": 2598,
+   "sample": "<!DOCTYPE html><html lang=\"en\" dir=\"ltr\" class=\"h-[100dvh] __variable_373265 __variable_0bcfef\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/2e4f4d7d0a588699-s.p.ttf\" as=\"font\" crossorigin=\"\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/_next/static/media/44b29ac9d724ab3d-s.p.ttf\" as=\"font\" crossorigin=\"\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/_next/static/media/619020d4ab9661c5-s.p.ttf\" as=\"font\" crossorigin=\"\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/_next/static/media/8f68945d16c40224-s.p.ttf\" as=\"font\" crossorigin=\"\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/_next/static/media/a483 …",
+   "extracted": {
+    "html": 1110147,
+    "mentionsUSDT": true,
+    "mentionsFee": true
+   },
+   "rate": {
+    "cf-ray": "a4d192e5fd8dcbca-MAD",
+    "content-type": "text/html; charset=utf-8"
+   }
+  }
+ ]
+}
