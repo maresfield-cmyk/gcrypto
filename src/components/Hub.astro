@@ -9,7 +9,8 @@ const { lang, asset, path } = Astro.props;
 const F = fees(), M = matrix(), A = F.assets[asset], m = M.assets[asset];
 const sorted = cellsOf(F, asset), best = cheapestOf(F, asset);
 const L = (p: string) => `/${lang}${p}`;
-const combos = (amount: number) => Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, pct: (c.fee_usd / amount) * 100, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null }))).filter((x) => x.min_usd == null || x.min_usd <= amount).sort((a, b) => a.fee_usd - b.fee_usd).slice(0, 3);
+const combos = Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, min: c.min, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null }))).sort((a, b) => a.fee_usd - b.fee_usd).slice(0, 5);
+const AMTS = [100, 1000, 10000];
 const [h1a, h1b] = t(lang, 'hub.h1', { asset: '\u0000' }).split('\u0000');
 const btc = asset === 'btc' ? A.networks.bitcoin : null;
 const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd).filter((v: any) => typeof v === 'number').length >= 2).slice(0, 2);   // a card with a single line says nothing: hidden
@@ -42,6 +43,8 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
     {m.networks.map((n: string) => { const c = m.cheapest_per_network[n]; return <tr><td><a href={L(`/networks/${n}/`)}>{F.networks[n]?.name ?? n}</a></td><td>{c ? <a href={L(`/exchanges/${c.exchange}/`)}>{m.exchanges[c.exchange].name}</a> : <span class="meta">{t(lang, 'hub.no_data')}</span>}</td><td class="num">{c ? `${fmtNum(lang, c.fee)} ${A.symbol}` : '–'}</td><td class="num">{c ? fmtUsd(lang, c.fee_usd) : '–'}</td></tr>; })}
   </tbody></table></div>
   <p class="meta"><a href={L(`/compare/${asset}-withdrawal-fees/`)}>{t(lang, 'compare.h1', { asset: A.symbol })} →</a></p>
-  {[100, 1000, 10000].map((amt) => { const c = combos(amt); return c.length ? <div><h2>{t(lang, 'hub.best_combo', { amount: t(lang, `amount.${amt}`) })}</h2><p class="lead">{t(lang, 'hub.combo_intro', { asset: A.symbol })}</p>
-    <div class="tbl"><table><tbody>{c.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{F.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} {A.symbol}</td><td class="num">{fmtUsd(lang, x.fee_usd)}</td><td class="num">{x.pct.toFixed(2)}%</td></tr>)}</tbody></table></div></div> : null; })}
+  {combos.length > 0 && <div><h2>{t(lang, 'hub.best_combo', { asset: A.symbol })}</h2><p class="lead">{t(lang, 'hub.combo_intro')}</p>
+    <div class="scroll"><table><thead><tr><th>#</th><th>{t(lang, 'compare.exchange')} · {t(lang, 'hub.network')}</th><th class="num">{t(lang, 'hub.fee')}</th><th class="num">≈ USD</th>{AMTS.map((a) => <th class="num">{t(lang, `amount.${a}`)}</th>)}</tr></thead><tbody>
+      {combos.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{F.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} {A.symbol}</td><td class="num">{fmtUsd(lang, x.fee_usd)}</td>{AMTS.map((a) => <td class="num">{x.min_usd != null && x.min_usd > a ? <span class="meta">{t(lang, 'hub.combo_min', { min: `${fmtNum(lang, x.min)} ${A.symbol}` })}</span> : `${((x.fee_usd / a) * 100).toFixed(2)}%`}</td>)}</tr>)}
+    </tbody></table></div></div>}
 </Layout>
