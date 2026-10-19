@@ -26,7 +26,7 @@ const skip = new Set(['note', 'estimation_wallet']);
   </tbody></table></div>
   {n.cases_usd && <div><h2>{t(lang, 'hub.cases_title', { asset: main.symbol, network: N.name })}</h2><div class="tbl"><table><tbody>{Object.entries(n.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <tr><td>{t(lang, `case.${k}`)}</td><td class="num">{fmtUsd(lang, v)}</td></tr>)}</tbody></table></div></div>}
   <h2>{t(lang, 'net.how_made')}</h2>
-  <dl class="kv num">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'number' ? fmtNum(lang, v) : typeof v === 'object' ? Object.entries(v).map(([kk, vv]: any) => `${kk}: ${typeof vv === 'number' ? fmtNum(lang, vv) : vv}`).join(' · ') : String(v)}</dd></>)}</dl>
+  <dl class="kv num" style="grid-template-columns:max-content minmax(0,1fr)">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'number' ? fmtNum(lang, v) : typeof v === 'object' ? Object.entries(v).map(([kk, vv]: any) => `${kk}: ${typeof vv === 'number' ? fmtNum(lang, vv) : vv}`).join(' · ') : String(v)}</dd></>)}</dl>
   {n.breakdown.note && <p class="note" style="margin-top:12px">{n.breakdown.note}</p>}
   <p class="meta">{t(lang, 'source')}: {n.source}</p>
   <h2>{t(lang, 'net.chart7')} · {main.symbol}</h2>

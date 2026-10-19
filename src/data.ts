@@ -14,7 +14,7 @@ export const defaultAsset = () => assetList().find((a) => a.default) ?? assetLis
 const strings: Record<string, Record<string, string>> = {};
 for (const l of LANGS) strings[l] = J(`locales/${l}.json`);
 export function t(lang: string, key: string, vars: Record<string, string | number> = {}) {
-  let s = strings[lang]?.[key] ?? strings.en[key] ?? key;
+  let s = strings[lang]?.[key] ?? strings.en[key] ?? key.replace(/^case\./, '').replace(/_/g, ' ');
   for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
   return s;
 }
