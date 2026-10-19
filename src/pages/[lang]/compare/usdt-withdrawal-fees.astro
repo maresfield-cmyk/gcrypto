@@ -1,0 +1,22 @@
+---
+import Layout from '../../../components/Layout.astro';
+import { LANGS, t, networks, matrix, fmtNum } from '../../../data';
+export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
+const { lang } = Astro.params;
+const N = networks(), M = matrix();
+const L = (p: string) => `/${lang}${p}`;
+const exs = Object.entries(M.exchanges) as any[];
+---
+<Layout lang={lang} title={t(lang, 'compare.title')} description={t(lang, 'compare.intro')} path={L('/compare/usdt-withdrawal-fees/')} updated={M.generated_at} crumbs={[{ name: t(lang, 'compare.title'), path: L('/compare/usdt-withdrawal-fees/') }]}>
+  <h1>{t(lang, 'compare.h1')}</h1>
+  <p class="lead">{t(lang, 'compare.intro')}</p>
+  <div class="scroll"><table id="cmp"><thead><tr><th class="sortable" data-col="0">{t(lang, 'compare.exchange')}</th>{M.networks.map((n: string, i: number) => <th class="num sortable" data-col={i + 1}><a href={L(`/networks/${n}/`)}>{N.networks[n]?.name ?? n}</a></th>)}</tr></thead><tbody>
+    {exs.map(([id, e]) => { const best = Math.min(...M.networks.map((n: string) => e.cells[n]?.enabled && e.cells[n].fee != null && !e.cells[n].flags.length ? e.cells[n].fee : Infinity)); return <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a>{e.stale && <span class="pill warn"> {e.note && /key/.test(e.note) ? 'not connected' : 'stale'}</span>}</td>{M.networks.map((n: string) => { const c = e.cells[n]; return <td class={'num' + (c && c.fee === best && c.enabled ? ' best' : '')} data-v={c && c.fee != null ? c.fee : ''}>{!c ? '–' : c.fee == null ? '?' : <>{fmtNum(lang, c.fee)}{!c.enabled && <span class="pill bad"> {t(lang, 'ex.closed')}</span>}</>}</td>; })}</tr>; })}
+  </tbody></table></div>
+  <p class="meta">{t(lang, 'compare.cheapest')}: <span class="best">■</span></p>
+  <script is:inline>
+    document.querySelectorAll('#cmp th.sortable').forEach(function (th) { th.addEventListener('click', function () { var col = +th.dataset.col, tb = document.querySelector('#cmp tbody'), rows = [].slice.call(tb.rows), asc = th.dataset.asc !== '1'; th.dataset.asc = asc ? '1' : '0';
+      rows.sort(function (a, b) { var x = a.cells[col], y = b.cells[col]; if (col === 0) return asc ? x.textContent.localeCompare(y.textContent) : y.textContent.localeCompare(x.textContent); var vx = x.dataset.v === '' ? Infinity : +x.dataset.v, vy = y.dataset.v === '' ? Infinity : +y.dataset.v; return asc ? vx - vy : vy - vx; });
+      rows.forEach(function (r) { tb.appendChild(r); }); }); });
+  </script>
+</Layout>

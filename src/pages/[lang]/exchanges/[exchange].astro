@@ -1,0 +1,26 @@
+---
+import Layout from '../../../components/Layout.astro';
+import { LANGS, t, networks, exchanges, fmtNum, fmtDate, fmtUsd } from '../../../data';
+export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(exchanges().exchanges).map((exchange) => ({ params: { lang, exchange } })));
+const { lang, exchange } = Astro.params;
+const N = networks(), E = exchanges(), e = E.exchanges[exchange];
+const L = (p: string) => `/${lang}${p}`;
+const rows = [...e.rows].sort((a: any, b: any) => a.asset.localeCompare(b.asset) || (a.fee ?? 1e9) - (b.fee ?? 1e9));
+const noKey = e.note && /key/i.test(e.note);
+---
+<Layout lang={lang} title={t(lang, 'ex.title', { exchange: e.name })} description={`${e.name}: USDT and BTC withdrawal fees per network, minimums, Gulf licensing and funding options.`} path={L(`/exchanges/${exchange}/`)} updated={E.generated_at} crumbs={[{ name: e.name, path: L(`/exchanges/${exchange}/`) }]}>
+  <h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1>
+  {e.fee_source === 'manual' && <p class="note">{t(lang, 'ex.manual_note')} <a href={e.fee_page} rel="nofollow noopener">{t(lang, 'ex.fee_page')}</a></p>}
+  {noKey && <p class="note">{t(lang, 'ex.no_key_note')}</p>}
+  {e.stale && !noKey && <p class="note stale">{t(lang, 'stale', { time: e.observed_at })}: {e.stale_reason}</p>}
+  <div class="scroll"><table><thead><tr><th>{t(lang, 'ex.asset')}</th><th>{t(lang, 'ex.network')}</th><th class="num">{t(lang, 'ex.fee')}</th><th class="num">≈ USD</th><th class="num">{t(lang, 'ex.min')}</th><th>{t(lang, 'ex.status')}</th><th>{t(lang, 'ex.verified')}</th></tr></thead><tbody>
+    {rows.map((r: any) => <tr><td>{r.asset}</td><td>{N.networks[r.network] ? <a href={L(`/networks/${r.network}/`)}>{N.networks[r.network].name}</a> : r.network}</td><td class="num">{r.fee == null ? <span class="meta">?</span> : `${fmtNum(lang, r.fee)} ${r.fee_asset}`}</td><td class="num">{fmtUsd(lang, r.fee_usd)}</td><td class="num">{r.min != null ? fmtNum(lang, r.min) : '–'}</td><td><span class={'pill ' + (r.withdraw_enabled ? 'good' : 'bad')}>{t(lang, r.withdraw_enabled ? 'ex.open' : 'ex.closed')}</span></td><td class="meta">{r.last_verified ? fmtDate(lang, r.last_verified) : r.observed_at ? fmtDate(lang, r.observed_at) : t(lang, 'ex.unverified')}{r.flags?.some((f: string) => /older/.test(f)) && <span class="pill warn"> old</span>}</td></tr>)}
+    {!rows.length && <tr><td colspan="7" class="meta">{t(lang, 'hub.no_data')}</td></tr>}
+  </tbody></table></div>
+  <h2>{t(lang, 'ex.facts')}</h2>
+  <table><thead><tr><th>{t(lang, 'ex.region')}</th><th>{t(lang, 'ex.licence')}</th><th>{t(lang, 'ex.verified')}</th></tr></thead><tbody>
+    {e.facts.gulf_licensing.map((g: any) => <tr><td>{g.region}</td><td>{g.status}{g.source && <> · <a href={g.source} rel="nofollow noopener">{t(lang, 'source')}</a></>}</td><td class="meta">{g.verified && g.last_verified ? fmtDate(lang, g.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</td></tr>)}
+  </tbody></table>
+  <dl class="kv" style="margin-top:12px"><dt>{t(lang, 'ex.currencies')}</dt><dd>{e.facts.deposit_currencies.length ? e.facts.deposit_currencies.join(', ') : '–'}</dd><dt>{t(lang, 'ex.p2p')}</dt><dd>{t(lang, e.facts.p2p ? 'ex.yes' : 'ex.no')}</dd><dt>{t(lang, 'ex.verified')}</dt><dd>{e.facts.last_verified ? fmtDate(lang, e.facts.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</dd></dl>
+  <p class="meta"><a href={e.website} rel="nofollow noopener">{e.website}</a></p>
+</Layout>

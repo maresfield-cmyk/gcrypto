@@ -1,0 +1,21 @@
+---
+// Simple line chart (SVG, no JS) for a network's fee history over a number of days.
+import { fmtUsd } from '../data';
+interface Props { lang: string; rows: { ts: string; fee_usd: number }[]; days: number; title: string }
+const { lang, rows, days, title } = Astro.props;
+const since = Date.now() - days * 86400e3;
+const pts = rows.filter((r) => Date.parse(r.ts) > since);
+const W = 640, H = 180, PL = 52, PB = 24;
+const vals = pts.map((p) => p.fee_usd), min = Math.min(0, ...vals), max = Math.max(...vals, 0.0001);
+const x = (ts: string) => PL + ((Date.parse(ts) - since) / (days * 86400e3)) * (W - PL - 8);
+const y = (v: number) => 8 + (1 - (v - min) / (max - min)) * (H - PB - 8);
+const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.ts).toFixed(1)},${y(p.fee_usd).toFixed(1)}`).join(' ');
+const ticks = [0, 0.5, 1].map((f) => min + (max - min) * f);
+---
+<figure style="margin:0">
+  <figcaption class="meta">{title} · {pts.length} {pts.length === 1 ? 'point' : 'points'}</figcaption>
+  <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={title} style="max-width:640px;display:block">
+    {ticks.map((v) => <g><line x1={PL} x2={W - 8} y1={y(v)} y2={y(v)} stroke="currentColor" stroke-opacity="0.15" /><text x={PL - 6} y={y(v) + 4} font-size="11" text-anchor="end" fill="currentColor" fill-opacity="0.7">{fmtUsd(lang, v, 4)}</text></g>)}
+    {pts.length > 1 ? <path d={d} fill="none" stroke="currentColor" stroke-width="1.8" /> : pts.map((p) => <circle cx={x(p.ts)} cy={y(p.fee_usd)} r="3" fill="currentColor" />)}
+  </svg>
+</figure>

@@ -1,0 +1,23 @@
+{
+  "_doc": "Every exchange's network names mapped to our internal network ids (config/networks.json ids, plus a few extra chains exchanges offer). A name not listed here is UNMAPPED: the fetcher drops that row, writes it to data/out/unmapped.json and raises an alert, so a wrong mapping is never published silently. Keys are matched case-insensitively after trimming.",
+  "ids": ["tron", "ethereum", "solana", "bsc", "polygon", "arbitrum", "ton", "bitcoin", "optimism", "avalanche", "aptos", "base", "near", "celo", "lightning"],
+  "aliases": {
+    "tron": ["TRX", "TRC20", "TRC-20", "USDT-TRC20", "Tron", "TRON", "trx", "TRON (TRC20)"],
+    "ethereum": ["ETH", "ERC20", "ERC-20", "USDT-ERC20", "Ethereum", "eth", "Ethereum (ERC20)", "BTC-Bitcoin-ETH", "ETH-Ethereum"],
+    "solana": ["SOL", "Solana", "sol", "USDT-Solana", "Solana (SOL)"],
+    "bsc": ["BSC", "BEP20", "BEP-20", "BNB Smart Chain (BEP20)", "BNB Smart Chain", "USDT-BSC", "bsc", "BNB"],
+    "polygon": ["MATIC", "POLYGON", "Polygon", "Polygon POS", "Polygon PoS", "USDT-Polygon", "matic", "POL", "Polygon (MATIC)"],
+    "arbitrum": ["ARBITRUM", "ARB", "Arbitrum One", "ArbitrumOne", "USDT-Arbitrum One", "arbitrum", "Arbitrum"],
+    "ton": ["TON", "ton", "ton2", "USDT-TON", "The Open Network", "Toncoin"],
+    "bitcoin": ["BTC", "Bitcoin", "btc", "BTC-Bitcoin"],
+    "optimism": ["OPTIMISM", "OP", "Optimism", "optimism", "USDT-Optimism", "OPETH"],
+    "avalanche": ["AVAXC", "AVAX C-Chain", "AVAXC-Chain", "Avalanche C-Chain", "avaxc", "USDT-Avalanche C-Chain", "CAVAX", "Avalanche C"],
+    "aptos": ["APT", "Aptos", "aptos", "USDT-Aptos"],
+    "base": ["BASE", "Base", "base", "USDT-Base"],
+    "near": ["NEAR", "near"],
+    "celo": ["CELO", "celo"],
+    "lightning": ["LIGHTNING", "Lightning", "BTC-Lightning", "Lightning Network"]
+  },
+  "ignore": ["KCC", "CFX", "Stable", "KAVA EVM Co-Chain", "PLASMA", "Plasma", "XTZ", "Asset Hub(Polkadot)", "statemint", "Morph", "kavaevm", "stable", "plasma", "xtz", "kcc", "cfx", "SEGWITBTC", "BTC-SegWit", "BTC-Bitcoin-SegWit", "BTCK", "BSC-OPBNB", "opBNB", "MANTLE", "LINEA", "SCROLL", "ZKSYNCERA", "zkSync Era", "STARKNET", "SUI", "HYPE", "SEI", "Berachain", "TAIKO", "KAIA", "INJ", "XLAYER", "SONIC", "MOVEMENT", "Monad", "ABSTRACT", "Unichain", "Soneium", "HASHKEY", "Rootstock", "Tempo"],
+  "_ignore_doc": "Networks we deliberately do not track (minor or exchange-specific chains). Names here are dropped without an alert."
+}

@@ -1,0 +1,7 @@
+---
+import Widget from '../../../components/Widget.astro';
+import { t, networks, fmtUsd, fmtTime } from '../../../data';
+export const getStaticPaths = () => Object.keys(networks().networks).map((network) => ({ params: { network } }));
+const { network } = Astro.params; const lang = 'en', N = networks(), n = N.networks[network];
+---
+<Widget lang={lang} title={`${n.name}: ${t(lang, 'widget.fee_now')}`} refresh={network}><div class="t">{n.name} · {n.token} {t(lang, 'widget.fee_now').replace('USDT ', '')}</div><div class="f">{fmtUsd(lang, n.fee_usd)}</div><div class="s">{t(lang, 'minutes', { n: n.eta_min })} · {t(lang, 'updated', { time: fmtTime(lang, N.generated_at) })}</div></Widget>

@@ -1,0 +1,33 @@
+---
+import Layout from '../../../components/Layout.astro';
+import Chart from '../../../components/Chart.astro';
+import { LANGS, t, networks, matrix, history, fmtUsd, fmtNum, fmtTime, fmtDate } from '../../../data';
+export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(networks().networks).map((network) => ({ params: { lang, network } })));
+const { lang, network } = Astro.params;
+const N = networks(), M = matrix(), n = N.networks[network];
+const rows = history().filter((r) => r.network === network);
+const L = (p: string) => `/${lang}${p}`;
+const offers = Object.entries(M.exchanges).map(([id, e]: any) => ({ id, name: e.name, cell: e.cells[network] })).filter((x) => x.cell && x.cell.fee != null).sort((a, b) => a.cell.fee - b.cell.fee);
+const skip = new Set(['note']);
+---
+<Layout lang={lang} title={t(lang, 'net.title', { network: n.name })} description={`${n.name}: ${fmtUsd(lang, n.fee_usd)} per USDT transfer right now, how it is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/${network}.png`} updated={N.generated_at} crumbs={[{ name: n.name, path: L(`/networks/${network}/`) }]}>
+  <h1>{t(lang, 'net.h1', { network: n.name })}</h1>
+  <div class="grid">
+    <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={n.id}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
+    <div class="card"><div class="sub">{t(lang, 'net.native_fee', { native: n.native })}</div><div class="fee num">{fmtNum(lang, n.fee_native)}</div><div class="sub">1 {n.native} = {fmtUsd(lang, n.price_usd, 2)}</div></div>
+    <div class="card"><div class="sub">{t(lang, 'net.time')}</div><div class="fee">{t(lang, 'minutes', { n: n.eta_min })}</div><div class="sub">{t(lang, 'net.time_detail', { blocks: n.confirmations.count, block_time: n.confirmations && N.networks[network] ? (await import('../../../data')).netConfig().find((c: any) => c.id === network).block_time_s : '' })}</div></div>
+  </div>
+  {n.cases_usd && <div><h2>{t(lang, 'net.cases')}</h2><table><tbody>{Object.entries(n.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <tr><td>{t(lang, `case.${k}`)}</td><td class="num">{fmtUsd(lang, v)}</td></tr>)}</tbody></table></div>}
+  <h2>{t(lang, 'net.how_made')}</h2>
+  <dl class="kv num">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'object' ? JSON.stringify(v) : String(v)}</dd></>)}</dl>
+  {n.breakdown.note && <p class="note">{n.breakdown.note}</p>}
+  <p class="meta">{t(lang, 'source')}: {n.source}</p>
+  <h2>{t(lang, 'net.chart7')}</h2>
+  {rows.length ? <Chart lang={lang} rows={rows} days={7} title={t(lang, 'net.chart7')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, N.generated_at) })}</p>}
+  <h2>{t(lang, 'net.chart30')}</h2>
+  {rows.length ? <Chart lang={lang} rows={rows} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, N.generated_at) })}</p>}
+  {n.token === 'USDT' && <div><h2>{t(lang, 'net.exchanges', { network: n.name })}</h2>
+    <table><thead><tr><th>{t(lang, 'compare.exchange')}</th><th class="num">{t(lang, 'ex.fee')}</th><th class="num">{t(lang, 'ex.min')}</th><th>{t(lang, 'ex.status')}</th></tr></thead><tbody>
+      {offers.map((o, i) => <tr><td><a href={L(`/exchanges/${o.id}/`)}>{o.name}</a></td><td class={'num' + (i === 0 ? ' best' : '')}>{fmtNum(lang, o.cell.fee)} USDT</td><td class="num">{o.cell.min != null ? fmtNum(lang, o.cell.min) : '–'}</td><td><span class={'pill ' + (o.cell.enabled ? 'good' : 'bad')}>{t(lang, o.cell.enabled ? 'ex.open' : 'ex.closed')}</span></td></tr>)}
+    </tbody></table></div>}
+</Layout>

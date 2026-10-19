@@ -1,0 +1,10 @@
+---
+// Inline SVG sparkline from [ts, value] points; flat line when there is only one point.
+interface Props { points: [string, number][]; label?: string }
+const { points, label = '' } = Astro.props;
+const vals = points.map((p) => p[1]);
+const min = Math.min(...vals), max = Math.max(...vals), W = 110, H = 30;
+const y = (v: number) => (max === min ? H / 2 : H - 3 - ((v - min) / (max - min)) * (H - 6));
+const d = vals.length ? vals.map((v, i) => `${i === 0 ? 'M' : 'L'}${vals.length === 1 ? W / 2 : (i / (vals.length - 1)) * W},${y(v)}`).join(' ') : '';
+---
+{vals.length ? <svg class="spark" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}><path d={d} fill="none" stroke="currentColor" stroke-width="1.6" /></svg> : <span class="meta">–</span>}

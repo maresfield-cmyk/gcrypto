@@ -1,0 +1,99 @@
+# Hand-maintained exchange facts. Every row carries last_verified (YYYY-MM-DD); the site shows it and alerts after 14 days.
+# verified: false = filled in from general knowledge, NOT yet checked against the source by Patrick: the site labels it "unverified".
+# Licensing wording must stay factual and dated; link the regulator's register where possible.
+exchanges:
+  binance:
+    name: Binance
+    website: https://www.binance.com
+    fee_source: api            # api = fetched from the exchange's API; manual = data/manual/fees-manual.csv
+    fee_page: https://www.binance.com/en/fee/cryptoFee
+    gulf_licensing:
+      - { region: "Dubai (VARA)", status: "VASP licence (Binance FZE)", source: "https://www.vara.ae/en/public-register/", last_verified: "", verified: false }
+      - { region: "Bahrain (CBB)", status: "Category 4 crypto-asset licence (BPay / Binance Bahrain)", source: "https://www.cbb.gov.bh/", last_verified: "", verified: false }
+      - { region: "Abu Dhabi (ADGM)", status: "not licensed", source: "https://www.adgm.com/public-registers", last_verified: "", verified: false }
+      - { region: "Saudi Arabia", status: "no licence regime; SAMA/CMA warn against unlicensed crypto trading", source: "https://www.sama.gov.sa/", last_verified: "", verified: false }
+    deposit_currencies: ["AED", "SAR", "BHD", "KWD", "QAR"]   # via P2P and/or card; verify which are bank deposits
+    p2p: true
+    last_verified: ""
+  bybit:
+    name: Bybit
+    website: https://www.bybit.com
+    fee_source: api
+    fee_page: https://www.bybit.com/en/help-center/article/Withdrawal-Fees
+    gulf_licensing:
+      - { region: "Dubai (VARA)", status: "VASP licence (Bybit FZE)", source: "https://www.vara.ae/en/public-register/", last_verified: "", verified: false }
+    deposit_currencies: ["AED", "SAR", "KWD", "QAR", "BHD"]
+    p2p: true
+    last_verified: ""
+  okx:
+    name: OKX
+    website: https://www.okx.com
+    fee_source: api
+    fee_page: https://www.okx.com/fees
+    gulf_licensing:
+      - { region: "Dubai (VARA)", status: "VASP licence (OKX Middle East Fintech FZE)", source: "https://www.vara.ae/en/public-register/", last_verified: "", verified: false }
+    deposit_currencies: ["AED"]
+    p2p: true
+    last_verified: ""
+  kucoin:
+    name: KuCoin
+    website: https://www.kucoin.com
+    fee_source: api
+    fee_page: https://www.kucoin.com/fee/withdrawal
+    gulf_licensing:
+      - { region: "Gulf", status: "no Gulf licence found", source: "", last_verified: "", verified: false }
+    deposit_currencies: []
+    p2p: true
+    last_verified: ""
+  bitget:
+    name: Bitget
+    website: https://www.bitget.com
+    fee_source: api
+    fee_page: https://www.bitget.com/fee
+    gulf_licensing:
+      - { region: "Gulf", status: "no Gulf licence found", source: "", last_verified: "", verified: false }
+    deposit_currencies: []
+    p2p: true
+    last_verified: ""
+  rain:
+    name: Rain
+    website: https://www.rain.com
+    fee_source: manual
+    fee_page: https://www.rain.com        # no public fee page found (2026-10-19); fees are in the app / help centre
+    gulf_licensing:
+      - { region: "Bahrain (CBB)", status: "Category 3 crypto-asset licence (Rain Financial)", source: "https://www.cbb.gov.bh/", last_verified: "", verified: false }
+      - { region: "Abu Dhabi (ADGM)", status: "FSRA licence (Rain Trading)", source: "https://www.adgm.com/public-registers", last_verified: "", verified: false }
+    deposit_currencies: ["BHD", "AED", "SAR", "KWD", "OMR"]
+    p2p: false
+    last_verified: ""
+  bitoasis:
+    name: BitOasis
+    website: https://bitoasis.net
+    fee_source: manual
+    fee_page: https://bitoasis.net/en/fees    # blocks scripts (403); check in a browser
+    gulf_licensing:
+      - { region: "Dubai (VARA)", status: "VASP licence (broker-dealer)", source: "https://www.vara.ae/en/public-register/", last_verified: "", verified: false }
+    deposit_currencies: ["AED", "SAR"]
+    p2p: false
+    last_verified: ""
+  coinmena:
+    name: CoinMENA
+    website: https://www.coinmena.com
+    fee_source: manual
+    fee_page: https://www.coinmena.com/fees
+    gulf_licensing:
+      - { region: "Bahrain (CBB)", status: "Category 3 crypto-asset licence", source: "https://www.cbb.gov.bh/", last_verified: "", verified: false }
+      - { region: "UAE (SCA)", status: "licensed", source: "https://www.sca.gov.ae/", last_verified: "", verified: false }
+    deposit_currencies: ["BHD", "AED", "SAR", "KWD", "OMR", "USD"]
+    p2p: false
+    last_verified: ""
+  cryptocom:
+    name: Crypto.com
+    website: https://crypto.com
+    fee_source: manual        # switches to api if CRYPTOCOM_API_KEY is set
+    fee_page: https://crypto.com/exchange/document/fees-limits
+    gulf_licensing:
+      - { region: "Dubai (VARA)", status: "VASP licence", source: "https://www.vara.ae/en/public-register/", last_verified: "", verified: false }
+    deposit_currencies: ["AED"]
+    p2p: false
+    last_verified: ""

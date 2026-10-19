@@ -1,0 +1,55 @@
+---
+import Layout from '../../components/Layout.astro';
+import { LANGS, t, networks, matrix, exchanges } from '../../data';
+export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
+const { lang } = Astro.params;
+const N = networks(), M = matrix(), E = exchanges();
+const L = (p: string) => `/${lang}${p}`;
+// everything the calculator needs, inlined so it works offline once loaded
+const data = { networks: Object.fromEntries(Object.values(N.networks).map((n: any) => [n.id, { name: n.name, token: n.token, fee_usd: n.fee_usd, eta_min: n.eta_min }])), btc_usd: N.prices.usd.bitcoin,
+  exchanges: Object.fromEntries(Object.entries(E.exchanges).map(([id, e]: any) => [id, { name: e.name, rows: e.rows.filter((r: any) => r.fee != null && !r.flags.length).map((r: any) => ({ asset: r.asset, network: r.network, fee: r.fee, fee_asset: r.fee_asset, min: r.min, enabled: r.withdraw_enabled, confirms: r.deposit_confirms })) }])) };
+const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt', 'calc.alt_wallet', 'calc.min', 'calc.below_min', 'calc.not_offered', 'minutes'].map((k) => [k, t(lang, k)]));
+---
+<Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.intro')} path={L('/calculator/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
+  <h1>{t(lang, 'calc.title')}</h1>
+  <p class="lead">{t(lang, 'calc.intro')}</p>
+  <form id="calc" class="card" style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end">
+    <label>{t(lang, 'calc.amount')}<br><input id="amount" type="number" min="1" value="100" style="width:100%"></label>
+    <label>{t(lang, 'calc.asset')}<br><select id="asset" style="width:100%"><option value="USDT">USDT</option><option value="BTC">BTC</option></select></label>
+    <label>{t(lang, 'calc.from')}<br><select id="from" style="width:100%"><option value="wallet">{t(lang, 'calc.own_wallet')}</option>{Object.entries(E.exchanges).map(([id, e]: any) => <option value={id}>{e.name}</option>)}</select></label>
+    <label>{t(lang, 'calc.network')}<br><select id="network" style="width:100%">{Object.values(N.networks).map((n: any) => <option value={n.id} data-token={n.token}>{n.name}</option>)}</select></label>
+  </form>
+  <noscript><p class="note">{t(lang, 'calc.needs_js')}</p></noscript>
+  <div id="out" class="card" style="margin-top:14px" hidden>
+    <h2 style="margin-top:0">{t(lang, 'calc.result')}</h2>
+    <dl class="kv num"><dt>{t(lang, 'calc.fee')}</dt><dd id="r-fee"></dd><dt>{t(lang, 'calc.share')}</dt><dd id="r-pct"></dd><dt>{t(lang, 'calc.time')}</dt><dd id="r-time"></dd></dl>
+    <p id="r-alt" class="meta"></p><p id="r-note" class="meta"></p>
+  </div>
+  <script is:inline define:vars={{ data, S, lang }}>
+    var $ = function (id) { return document.getElementById(id); };
+    var usd = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
+    var ph = function (s, v) { return s.replace(/\{(\w+)\}/g, function (_, k) { return v[k]; }); };
+    function feeUsd(r) { return r.fee_asset === 'BTC' ? r.fee * data.btc_usd : r.fee; }
+    function calc() {
+      var amt = +$('amount').value || 0, asset = $('asset').value, from = $('from').value, net = $('network').value, n = data.networks[net];
+      $('out').hidden = false; $('r-note').textContent = ''; $('r-alt').textContent = '';
+      var feeU, time, amtUsd = asset === 'BTC' ? amt * data.btc_usd : amt;
+      if (from === 'wallet') {
+        if (n.token !== asset) { $('r-fee').textContent = '–'; $('r-pct').textContent = ''; $('r-time').textContent = ''; $('r-note').textContent = ph(S['calc.not_offered'], { exchange: 'Wallet', asset: asset, network: n.name }); return; }
+        feeU = n.fee_usd; time = ph(S['minutes'], { n: n.eta_min });
+        var alt = Object.values(data.networks).filter(function (x) { return x.token === asset && x.fee_usd != null; }).sort(function (a, b) { return a.fee_usd - b.fee_usd; })[0];
+        if (alt && alt.name !== n.name) $('r-alt').textContent = ph(S['calc.alt_wallet'], { network: alt.name, fee: usd(alt.fee_usd) });
+      } else {
+        var e = data.exchanges[from], r = e.rows.filter(function (x) { return x.asset === asset && x.network === net && x.enabled; })[0];
+        if (!r) { $('r-fee').textContent = '–'; $('r-pct').textContent = ''; $('r-time').textContent = ''; $('r-note').textContent = ph(S['calc.not_offered'], { exchange: e.name, asset: asset, network: n.name }); return; }
+        feeU = feeUsd(r); time = ph(S['minutes'], { n: n.eta_min });
+        if (r.min != null) $('r-note').textContent = amt < r.min ? ph(S['calc.below_min'], { min: r.min + ' ' + asset }) : ph(S['calc.min'], { exchange: e.name, network: n.name, min: r.min + ' ' + asset });
+        var alts = e.rows.filter(function (x) { return x.asset === asset && x.enabled && x.network !== net && data.networks[x.network]; }).sort(function (a, b) { return feeUsd(a) - feeUsd(b); });
+        if (alts.length && feeUsd(alts[0]) < feeU) $('r-alt').textContent = ph(S['calc.alt'], { exchange: e.name, network: data.networks[alts[0].network].name, fee: usd(feeUsd(alts[0])) });
+      }
+      $('r-fee').textContent = usd(feeU); $('r-pct').textContent = amtUsd > 0 ? (feeU / amtUsd * 100).toFixed(3) + '%' : '–'; $('r-time').textContent = time;
+    }
+    ['amount', 'asset', 'from', 'network'].forEach(function (id) { $(id).addEventListener('input', calc); $(id).addEventListener('change', calc); });
+    calc();
+  </script>
+</Layout>

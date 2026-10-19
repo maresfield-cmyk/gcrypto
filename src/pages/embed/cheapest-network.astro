@@ -1,0 +1,6 @@
+---
+import Widget from '../../components/Widget.astro';
+import { t, networks, fmtUsd, cheapestNetwork, fmtTime } from '../../data';
+const lang = 'en', N = networks(), b = cheapestNetwork(N);
+---
+<Widget lang={lang} title={t(lang, 'widget.cheapest')} refresh="cheapest"><div class="t">{t(lang, 'widget.cheapest')}</div><div class="n">{b?.name}</div><div class="f">{fmtUsd(lang, b?.fee_usd)}</div><div class="s">{t(lang, 'updated', { time: fmtTime(lang, N.generated_at) })}</div></Widget>

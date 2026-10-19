@@ -1,0 +1,57 @@
+# Scheduled data runs. Every 15 min: network fees + prices; every 6 h: exchange fees too (plus history rollup); manual trigger.
+# Writes data/history + data/out back to the repo, then deploys to Netlify only when a value moved meaningfully.
+# NOTE: GitHub-hosted runners are in the US and api.binance.com refuses US addresses (HTTP 451). If Binance fails here,
+# docs/runbook.md lists the options (self-hosted runner, or Binance via the manual sheet).
+name: update
+on:
+  schedule:
+    - cron: '*/15 * * * *'        # networks
+    - cron: '7 */6 * * *'         # networks + exchanges
+  workflow_dispatch:
+    inputs:
+      mode: { description: 'networks | all', default: 'all' }
+concurrency: { group: update, cancel-in-progress: false }
+permissions: { contents: write }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Fetch, validate, alert, build if needed
+        env:
+          BINANCE_API_KEY: ${{ secrets.BINANCE_API_KEY }}
+          BINANCE_API_SECRET: ${{ secrets.BINANCE_API_SECRET }}
+          BYBIT_API_KEY: ${{ secrets.BYBIT_API_KEY }}
+          BYBIT_API_SECRET: ${{ secrets.BYBIT_API_SECRET }}
+          OKX_API_KEY: ${{ secrets.OKX_API_KEY }}
+          OKX_API_SECRET: ${{ secrets.OKX_API_SECRET }}
+          OKX_PASSPHRASE: ${{ secrets.OKX_PASSPHRASE }}
+          CRYPTOCOM_API_KEY: ${{ secrets.CRYPTOCOM_API_KEY }}
+          CRYPTOCOM_API_SECRET: ${{ secrets.CRYPTOCOM_API_SECRET }}
+          TRONGRID_API_KEY: ${{ secrets.TRONGRID_API_KEY }}
+          TONAPI_KEY: ${{ secrets.TONAPI_KEY }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          MODE="${{ github.event.inputs.mode || (github.event.schedule == '7 */6 * * *' && 'all' || 'networks') }}"
+          node scripts/run.mjs "$MODE"
+      - name: Commit data
+        run: |
+          git config user.name "gcrypto-bot" && git config user.email "bot@users.noreply.github.com"
+          git add data/history data/out data/raw/*/latest.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "data: $(date -u +%FT%TZ) [skip ci]" && git push
+      - name: Deploy to Netlify (only when values moved)
+        if: ${{ hashFiles('dist/index.html') != '' }}
+        env: { NETLIFY_AUTH_TOKEN: '${{ secrets.NETLIFY_AUTH_TOKEN }}', NETLIFY_SITE_ID: '${{ secrets.NETLIFY_SITE_ID }}' }
+        run: npx --yes netlify-cli@17 deploy --prod --dir dist --message "data $(date -u +%FT%TZ)"
+      - name: Keep raw responses for 90 days
+        uses: actions/upload-artifact@v4
+        with: { name: 'raw-${{ github.run_id }}', path: data/raw, retention-days: 90, if-no-files-found: ignore }
