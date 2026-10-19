@@ -1,0 +1,47 @@
+---
+// The hub for one asset: used by /{lang}/ (the default asset) and /{lang}/assets/{asset}/.
+import Layout from './Layout.astro';
+import Sparkline from './Sparkline.astro';
+import AssetPicker from './AssetPicker.astro';
+import { t, fees, matrix, fmtUsd, fmtNum, fmtTime, cellsOf, cheapestOf } from '../data';
+interface Props { lang: string; asset: string; path: string }
+const { lang, asset, path } = Astro.props;
+const F = fees(), M = matrix(), A = F.assets[asset], m = M.assets[asset];
+const sorted = cellsOf(F, asset), best = cheapestOf(F, asset);
+const L = (p: string) => `/${lang}${p}`;
+const combos = (amount: number) => Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, pct: (c.fee_usd / amount) * 100, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null }))).filter((x) => x.min_usd == null || x.min_usd <= amount).sort((a, b) => a.fee_usd - b.fee_usd).slice(0, 3);
+const [h1a, h1b] = t(lang, 'hub.h1', { asset: '\u0000' }).split('\u0000');
+const btc = asset === 'btc' ? A.networks.bitcoin : null;
+const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd).some((v: any) => typeof v === 'number')).slice(0, 2);
+---
+<Layout lang={lang} title={t(lang, 'hub.title', { asset: A.symbol })} description={t(lang, 'hub.intro', { asset: A.symbol })} path={path} og={`/og/${asset}.png`}>
+  <div class="hero">
+    <p class="eyebrow">{t(lang, 'nav.home')} · {t(lang, 'updated', { time: fmtTime(lang, F.generated_at) })}</p>
+    <h1 aria-label={t(lang, 'hub.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} />{h1b}</h1>
+    <p class="lead">{t(lang, 'hub.intro', { asset: A.symbol })}</p>
+    {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
+  </div>
+  <div class="grid">
+    {sorted.map((n, i) => <a class={'card' + (i === 0 ? ' rank-1' : '')} href={L(`/networks/${n.network}/`)} style="text-decoration:none;color:inherit">
+      <div class="name">{n.name}</div>
+      <div class="fee" data-live-fee={`${asset}:${n.network}`}>{fmtUsd(lang, n.fee_usd)}</div>
+      <div class="sub num">{fmtNum(lang, n.fee_native)} {n.native} · {t(lang, 'minutes', { n: n.eta_min })}{n.stale && <span class="stale"> · {t(lang, 'stale', { time: n.observed_at.slice(0, 16).replace('T', ' ') })}</span>}</div>
+      <Sparkline points={F.sparklines_7d[`${asset}:${n.network}`] || []} label={t(lang, 'hub.trend7d')} />
+    </a>)}
+  </div>
+  <div class="two" style="margin-top:20px">
+    <div class="note"><strong>{t(lang, 'wallet_vs_exchange.title')}</strong><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.wallet')}</p><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.exchange')}</p></div>
+    {btc ? <div class="card"><div class="name">{t(lang, 'hub.btc_title')}</div><div class="sub">{t(lang, 'hub.btc_intro', { vbytes: btc.breakdown.tx_vbytes })}</div>
+      <dl class="kv num" style="margin-top:8px"><dt>{t(lang, 'hub.btc_fastest')}</dt><dd>{fmtUsd(lang, btc.cases_usd.fastest_btc)}</dd><dt>{t(lang, 'hub.btc_half_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.half_hour_btc)}</dd><dt>{t(lang, 'hub.btc_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.hour_btc)}</dd><dt>{t(lang, 'hub.btc_economy')}</dt><dd>{fmtUsd(lang, btc.cases_usd.economy_btc)}</dd></dl></div>
+    : showCases.map((c) => <div class="card"><div class="name">{t(lang, 'hub.cases_title', { asset: A.symbol, network: c.name })}</div>
+      <dl class="kv num" style="margin-top:8px">{Object.entries(c.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <><dt>{t(lang, `case.${k}`)}</dt><dd>{fmtUsd(lang, v)}</dd></>)}</dl></div>)}
+  </div>
+  <h2>{t(lang, 'hub.exchange_title', { asset: A.symbol })}</h2>
+  <p class="lead">{t(lang, 'hub.exchange_intro', { asset: A.symbol })}</p>
+  <div class="scroll"><table><thead><tr><th>{t(lang, 'hub.network')}</th><th>{t(lang, 'hub.cheapest_exchange')}</th><th class="num">{t(lang, 'hub.fee')}</th><th class="num">≈ USD</th></tr></thead><tbody>
+    {m.networks.map((n: string) => { const c = m.cheapest_per_network[n]; return <tr><td><a href={L(`/networks/${n}/`)}>{F.networks[n]?.name ?? n}</a></td><td>{c ? <a href={L(`/exchanges/${c.exchange}/`)}>{m.exchanges[c.exchange].name}</a> : <span class="meta">{t(lang, 'hub.no_data')}</span>}</td><td class="num">{c ? `${fmtNum(lang, c.fee)} ${A.symbol}` : '–'}</td><td class="num">{c ? fmtUsd(lang, c.fee_usd) : '–'}</td></tr>; })}
+  </tbody></table></div>
+  <p class="meta"><a href={L(`/compare/${asset}-withdrawal-fees/`)}>{t(lang, 'compare.h1', { asset: A.symbol })} →</a></p>
+  {[100, 1000, 10000].map((amt) => { const c = combos(amt); return c.length ? <div><h2>{t(lang, 'hub.best_combo', { amount: t(lang, `amount.${amt}`) })}</h2><p class="lead">{t(lang, 'hub.combo_intro', { asset: A.symbol })}</p>
+    <div class="tbl"><table><tbody>{c.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{F.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} {A.symbol}</td><td class="num">{fmtUsd(lang, x.fee_usd)}</td><td class="num">{x.pct.toFixed(2)}%</td></tr>)}</tbody></table></div></div> : null; })}
+</Layout>

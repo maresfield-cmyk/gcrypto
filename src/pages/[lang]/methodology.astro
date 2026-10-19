@@ -1,19 +1,22 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { LANGS, t, networks, exchanges, SITE_URL, fmtDate } from '../../data';
+import { LANGS, t, fees, exchanges, assetList, defaultAsset, SITE_URL, fmtDate } from '../../data';
 export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
 const { lang } = Astro.params;
-const N = networks(), E = exchanges();
+const F = fees(), E = exchanges(), N = { generated_at: F.generated_at };
+const assets = assetList();
 const L = (p: string) => `/${lang}${p}`;
-const dataset = { '@context': 'https://schema.org', '@type': 'Dataset', name: t(lang, 'site.name'), description: t(lang, 'site.tagline'), url: `${SITE_URL}${L('/methodology/')}`, license: 'https://creativecommons.org/licenses/by/4.0/', creator: { '@type': 'Organization', name: t(lang, 'site.name') }, temporalCoverage: `${N.generated_at.slice(0, 10)}/..`, distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/networks.json` }, { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/usdt-matrix.json` }] };
-const nets = Object.values(N.networks) as any[];
+const dataset = { '@context': 'https://schema.org', '@type': 'Dataset', name: t(lang, 'site.name'), description: t(lang, 'site.tagline'), url: `${SITE_URL}${L('/methodology/')}`, license: 'https://creativecommons.org/licenses/by/4.0/', creator: { '@type': 'Organization', name: t(lang, 'site.name') }, temporalCoverage: `${N.generated_at.slice(0, 10)}/..`, distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/fees.json` }, { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/matrix.json` }] };
+const nets = Object.values(defaultAsset().networks).concat(Object.values(F.assets.btc.networks)) as any[];
 ---
 <Layout lang={lang} title={t(lang, 'method.title')} description={t(lang, 'method.h1')} path={L('/methodology/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'method.title'), path: L('/methodology/') }]} jsonld={[dataset]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.methodology')}</p><h1>{t(lang, 'method.h1')}</h1>
   <p class="lead">{t(lang, 'method.cadence')}</p></div>
+  <h2>{t(lang, 'method.assets')}</h2>
+  <p>{t(lang, 'method.assets_text', { list: assets.map((a) => a.name).join(', ') })}</p>
   <h2>Network fees</h2>
   <div class="tbl"><table><thead><tr><th>Network</th><th>How the number is produced</th><th>Source</th></tr></thead><tbody>
-    {nets.map((n) => <tr><td><a href={L(`/networks/${n.id}/`)}>{n.name}</a></td><td>{n.breakdown.note || Object.keys(n.breakdown).filter((k) => k !== 'note').map((k) => k.replace(/_/g, ' ')).join(', ')}</td><td class="meta">{n.source}</td></tr>)}
+    {nets.map((n) => <tr><td><a href={L(`/networks/${n.network}/`)}>{n.name}</a></td><td>{n.breakdown.note || Object.keys(n.breakdown).filter((k) => k !== 'note').map((k) => k.replace(/_/g, ' ')).join(', ')}</td><td class="meta">{n.source}</td></tr>)}
   </tbody></table></div>
   <p>Fee in USD = fee in the native coin × the coin's USD price (CoinGecko, cached 5 minutes; Binance and OKX tickers as fallbacks). Time to credit = the confirmations major exchanges require × block time, from <code>config/networks.json</code> with a source per row.</p>
   <h2>Exchange withdrawal fees</h2>
@@ -28,6 +31,6 @@ const nets = Object.values(N.networks) as any[];
   <p>{t(lang, 'method.saudi_text')}</p>
   <h2>{t(lang, 'method.cite')}</h2>
   <pre>{t(lang, 'method.cite_text', { date: fmtDate(lang, N.generated_at) })}</pre>
-  <p>Raw data: <a href="/data/networks.json">networks.json</a> · <a href="/data/usdt-matrix.json">usdt-matrix.json</a> · <a href="/data/exchanges.json">exchanges.json</a></p>
+  <p>Raw data: <a href="/data/fees.json">fees.json</a> · <a href="/data/matrix.json">matrix.json</a> · <a href="/data/exchanges.json">exchanges.json</a></p>
   <p><a href={L('/embed/')}>{t(lang, 'embed.h1')} →</a></p>
 </Layout>

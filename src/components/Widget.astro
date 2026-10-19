@@ -17,8 +17,9 @@ const { lang, title, refresh } = Astro.props;
 </style></head><body><div class="w"><slot /><div class="s" data-credit set:html={t(lang, 'widget.credit', { site: `<a href="${SITE_URL}/${lang}/" target="_blank" rel="noopener">${t(lang, 'site.name')}</a>` })}></div></div>
 <script is:inline define:vars={{ refresh, lang }}>
   (function () { var fmt = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
-    setInterval(function () { fetch('/data/networks.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
-      if (refresh === 'cheapest') { var b = Object.values(d.networks).filter(function (n) { return n.token === 'USDT' && n.fee_usd != null; }).sort(function (a, c) { return a.fee_usd - c.fee_usd; })[0]; if (b) { document.querySelector('.n').textContent = b.name; document.querySelector('.f').textContent = fmt(b.fee_usd); } }
-      else { var n = d.networks[refresh]; if (n) document.querySelector('.f').textContent = fmt(n.fee_usd); }
+    setInterval(function () { fetch('/data/fees.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      var p = refresh.split(':');
+      if (p[0] === 'cheapest') { var b = Object.values(d.assets[p[1]].networks).filter(function (n) { return n.fee_usd != null; }).sort(function (a, c) { return a.fee_usd - c.fee_usd; })[0]; if (b) { document.querySelector('.n').textContent = b.name; document.querySelector('.f').textContent = fmt(b.fee_usd); } }
+      else { var n = d.assets[p[0]] && d.assets[p[0]].networks[p[1]]; if (n) document.querySelector('.f').textContent = fmt(n.fee_usd); }
     }).catch(function () {}); }, 5 * 60 * 1000); })();
 </script></body></html>

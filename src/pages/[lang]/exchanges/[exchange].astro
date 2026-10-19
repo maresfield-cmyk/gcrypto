@@ -1,9 +1,9 @@
 ---
 import Layout from '../../../components/Layout.astro';
-import { LANGS, t, networks, exchanges, fmtNum, fmtDate, fmtUsd } from '../../../data';
+import { LANGS, t, fees, exchanges, fmtNum, fmtDate, fmtUsd } from '../../../data';
 export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(exchanges().exchanges).map((exchange) => ({ params: { lang, exchange } })));
 const { lang, exchange } = Astro.params;
-const N = networks(), E = exchanges(), e = E.exchanges[exchange];
+const N = fees(), E = exchanges(), e = E.exchanges[exchange];
 const L = (p: string) => `/${lang}${p}`;
 const rows = [...e.rows].sort((a: any, b: any) => a.asset.localeCompare(b.asset) || (a.fee ?? 1e9) - (b.fee ?? 1e9));
 const noKey = e.note && /key/i.test(e.note);

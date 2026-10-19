@@ -1,7 +1,7 @@
 ---
 import Widget from '../../../components/Widget.astro';
-import { t, networks, fmtUsd, fmtTime } from '../../../data';
-export const getStaticPaths = () => Object.keys(networks().networks).map((network) => ({ params: { network } }));
-const { network } = Astro.params; const lang = 'en', N = networks(), n = N.networks[network];
+import { t, fees, defaultAsset, fmtUsd, fmtTime } from '../../../data';
+export const getStaticPaths = () => Object.keys(defaultAsset().networks).map((network) => ({ params: { network } }));
+const { network } = Astro.params; const lang = 'en', F = fees(), D = defaultAsset(), n = D.networks[network];
 ---
-<Widget lang={lang} title={`${n.name}: ${t(lang, 'widget.fee_now')}`} refresh={network}><div class="t">{n.name} · {n.token} {t(lang, 'widget.fee_now').replace('USDT ', '')}</div><div class="f">{fmtUsd(lang, n.fee_usd)}</div><div class="s">{t(lang, 'minutes', { n: n.eta_min })} · {t(lang, 'updated', { time: fmtTime(lang, N.generated_at) })}</div></Widget>
+<Widget lang={lang} title={`${n.name}: ${t(lang, 'widget.fee_now', { asset: D.symbol })}`} refresh={`${D.id}:${network}`}><div class="t">{n.name} · {t(lang, 'widget.fee_now', { asset: D.symbol })}</div><div class="f">{fmtUsd(lang, n.fee_usd)}</div><div class="s">{t(lang, 'minutes', { n: n.eta_min })} · {t(lang, 'updated', { time: fmtTime(lang, F.generated_at) })}</div></Widget>

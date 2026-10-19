@@ -2,8 +2,8 @@
 import fs from 'node:fs';
 import { getJson } from './http.mjs';
 const CACHE = 'data/raw/prices/cache.json', TTL = 5 * 60e3;
-export async function prices(networks) {
-  const ids = [...new Set(networks.map((n) => n.coingecko))];
+export async function prices(networks, extraIds = []) {
+  const ids = [...new Set([...networks.map((n) => n.coingecko), ...extraIds])];
   if (fs.existsSync(CACHE)) { const c = JSON.parse(fs.readFileSync(CACHE)); if (Date.now() - Date.parse(c.observed_at) < TTL && ids.every((i) => c.usd[i])) return c; }
   const out = { observed_at: new Date().toISOString(), source: '', usd: {} };
   try {

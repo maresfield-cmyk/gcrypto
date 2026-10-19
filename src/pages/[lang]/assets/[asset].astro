@@ -1,0 +1,7 @@
+---
+import Hub from '../../../components/Hub.astro';
+import { LANGS, assetList } from '../../../data';
+export const getStaticPaths = () => LANGS.flatMap((lang) => assetList().filter((a) => !a.default).map((a) => ({ params: { lang, asset: a.id } })));
+const { lang, asset } = Astro.params;
+---
+<Hub lang={lang} asset={asset} path={`/${lang}/assets/${asset}/`} />

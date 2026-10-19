@@ -112,13 +112,16 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   (function () {
     var fmt = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
     function tick() {
-      fetch('/data/networks.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
-        document.querySelectorAll('[data-live-fee]').forEach(function (el) { var n = d.networks[el.getAttribute('data-live-fee')]; if (n && n.fee_usd != null) el.textContent = fmt(n.fee_usd); });
+      fetch('/data/fees.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+        document.querySelectorAll('[data-live-fee]').forEach(function (el) { var k = el.getAttribute('data-live-fee').split(':'), n = d.assets[k[0]] && d.assets[k[0]].networks[k[1]]; if (n && n.fee_usd != null) el.textContent = fmt(n.fee_usd); });
         var u = document.querySelector('[data-live="updated"]'); if (u && d.generated_at) u.textContent = u.textContent.replace(/\S.*$/, '').trim() ? u.textContent : u.textContent;
       }).catch(function () {});
     }
     setInterval(tick, 5 * 60 * 1000);
   })();
+  // the asset picker (<details>): a click outside or Escape closes it
+  document.addEventListener('click', function (e) { document.querySelectorAll('details.apick[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.querySelectorAll('details.apick[open]').forEach(function (d) { d.removeAttribute('open'); }); });
 </script>
 </body>
 </html>

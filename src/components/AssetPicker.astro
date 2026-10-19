@@ -1,0 +1,30 @@
+---
+// The headline's asset control: looks like a field ("USDT ▾"); opens a list of every asset with its logo. Built on
+// <details>, so it works without JavaScript; a click outside closes it. Each item links to that asset's page.
+import { t, assetList } from '../data';
+interface Props { lang: string; current: string; base: string; route?: 'hub' | 'history' }
+const { lang, current, route = 'hub' } = Astro.props;
+const assets = assetList();
+const cur = assets.find((a) => a.id === current);
+const href = (a: any) => route === 'history' ? (a.default ? `/${lang}/history/` : `/${lang}/history/${a.id}/`) : (a.default ? `/${lang}/` : `/${lang}/assets/${a.id}/`);
+---
+<details class="apick"><summary aria-label={t(lang, 'picker.label')}><img src={`/coins/${cur.id}.svg`} alt="" width="26" height="26">{cur.symbol}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+  <ul role="list">{assets.map((a) => <li><a href={href(a)} aria-current={a.id === current ? 'page' : undefined}><img src={`/coins/${a.id}.svg`} alt="" width="22" height="22"><span>{a.symbol}</span><small>{a.name}</small></a></li>)}</ul>
+</details>
+<style is:global>
+  .apick { display: inline-block; position: relative; vertical-align: -0.12em; }
+  .apick > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 0.04em 0.38em 0.04em 0.3em; border: 1.5px solid var(--line-2); border-radius: 0.32em; background: var(--card); color: var(--fg); font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; transition: border-color .15s, box-shadow .15s; }
+  .apick > summary::-webkit-details-marker { display: none; }
+  .apick > summary:hover, .apick[open] > summary { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .apick > summary img { width: 0.72em; height: 0.72em; border-radius: 50%; }
+  .apick > summary svg { width: 0.5em; height: 0.5em; color: var(--muted); transition: transform .15s; }
+  .apick[open] > summary svg { transform: rotate(180deg); }
+  .apick ul { position: absolute; inset-inline-start: 0; top: calc(100% + 8px); z-index: 30; margin: 0; padding: 6px; list-style: none; min-width: 260px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 2px 4px rgba(15,23,42,.06), 0 24px 48px -16px rgba(15,23,42,.3); font-size: 15px; font-weight: 500; letter-spacing: 0; }
+  .apick ul a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; text-decoration: none; color: var(--fg); }
+  .apick ul a:hover, .apick ul a[aria-current="page"] { background: var(--tint); }
+  .apick ul a img { width: 22px; height: 22px; border-radius: 50%; flex: none; }
+  .apick ul a span { font-weight: 600; min-width: 48px; }
+  .apick ul a small { color: var(--muted); font-size: 12.5px; }
+  @media (max-width: 640px) { .apick ul { min-width: 230px; } }
+</style>
+

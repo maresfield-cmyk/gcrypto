@@ -1,0 +1,184 @@
+{
+  "_doc": "The assets we price, and on which networks. A token entry names the contract / mint / jetton master per network; a native entry has native: true and is priced as a plain transfer of the chain's own coin. 'from' = a funded wallet used only for gas estimation (nothing is sent); 'to' = a funded recipient. Order here = display order; the first asset is the hub's default view.",
+  "assets": [
+    {
+      "id": "usdt",
+      "symbol": "USDT",
+      "name": "Tether (USDT)",
+      "coingecko": "tether",
+      "kind": "stablecoin",
+      "default": true,
+      "on": {
+        "tron": {
+          "contract": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+          "decimals": 6
+        },
+        "ethereum": {
+          "contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimals": 6,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "28c6c06298d514db089934071355e5743bf21d60"
+        },
+        "solana": {
+          "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+        },
+        "bsc": {
+          "contract": "0x55d398326f99059fF775485246999027B3197955",
+          "decimals": 18,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "8894e0a0c962cb723c1976a4421c95949be2d4e3"
+        },
+        "polygon": {
+          "contract": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          "decimals": 6,
+          "from": "0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245",
+          "to": "f89d7b9c864f589bbf53a82105107622b35eaa40"
+        },
+        "arbitrum": {
+          "contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimals": 6,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "b38e8c17e38363af6ebdcb3dae12e0243582891d"
+        },
+        "ton": {
+          "master": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
+        }
+      }
+    },
+    {
+      "id": "usdc",
+      "symbol": "USDC",
+      "name": "USD Coin (USDC)",
+      "coingecko": "usd-coin",
+      "kind": "stablecoin",
+      "on": {
+        "ethereum": {
+          "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimals": 6,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "28c6c06298d514db089934071355e5743bf21d60"
+        },
+        "tron": {
+          "contract": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+          "decimals": 6
+        },
+        "solana": {
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        "bsc": {
+          "contract": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimals": 18,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "8894e0a0c962cb723c1976a4421c95949be2d4e3"
+        },
+        "polygon": {
+          "contract": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+          "decimals": 6,
+          "from": "0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245",
+          "to": "f89d7b9c864f589bbf53a82105107622b35eaa40"
+        },
+        "arbitrum": {
+          "contract": "0xaf88d065e77c8cC2239327C5EDb3A4Ab4d4C92e0",
+          "decimals": 6,
+          "from": "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+          "to": "b38e8c17e38363af6ebdcb3dae12e0243582891d"
+        }
+      }
+    },
+    {
+      "id": "btc",
+      "symbol": "BTC",
+      "name": "Bitcoin (BTC)",
+      "coingecko": "bitcoin",
+      "kind": "native",
+      "on": {
+        "bitcoin": {
+          "native": true
+        }
+      }
+    },
+    {
+      "id": "eth",
+      "symbol": "ETH",
+      "name": "Ether (ETH)",
+      "coingecko": "ethereum",
+      "kind": "native",
+      "on": {
+        "ethereum": {
+          "native": true
+        },
+        "arbitrum": {
+          "native": true
+        }
+      }
+    },
+    {
+      "id": "sol",
+      "symbol": "SOL",
+      "name": "Solana (SOL)",
+      "coingecko": "solana",
+      "kind": "native",
+      "on": {
+        "solana": {
+          "native": true
+        }
+      }
+    },
+    {
+      "id": "bnb",
+      "symbol": "BNB",
+      "name": "BNB",
+      "coingecko": "binancecoin",
+      "kind": "native",
+      "on": {
+        "bsc": {
+          "native": true
+        }
+      }
+    },
+    {
+      "id": "trx",
+      "symbol": "TRX",
+      "name": "Tron (TRX)",
+      "coingecko": "tron",
+      "kind": "native",
+      "on": {
+        "tron": {
+          "native": true
+        }
+      }
+    },
+    {
+      "id": "ton",
+      "symbol": "TON",
+      "name": "Toncoin (TON)",
+      "coingecko": "the-open-network",
+      "kind": "native",
+      "on": {
+        "ton": {
+          "native": true
+        }
+      },
+      "exchange_symbols": [
+        "TON",
+        "TONCOIN"
+      ]
+    },
+    {
+      "id": "pol",
+      "symbol": "POL",
+      "name": "Polygon (POL)",
+      "coingecko": "polygon-ecosystem-token",
+      "kind": "native",
+      "on": {
+        "polygon": {
+          "native": true
+        }
+      },
+      "exchange_symbols": [
+        "POL",
+        "MATIC"
+      ]
+    }
+  ]
+}

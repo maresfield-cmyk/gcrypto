@@ -1,44 +1,7 @@
 ---
-import Layout from '../../components/Layout.astro';
-import Sparkline from '../../components/Sparkline.astro';
-import { LANGS, t, networks, matrix, fmtUsd, fmtNum, fmtTime, cheapestNetwork } from '../../data';
+import Hub from '../../components/Hub.astro';
+import { LANGS, defaultAsset } from '../../data';
 export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
 const { lang } = Astro.params;
-const N = networks(), M = matrix();
-const list = Object.values(N.networks).filter((n: any) => n.token === 'USDT') as any[];
-const sorted = [...list].filter((n) => n.fee_usd != null).sort((a, b) => a.fee_usd - b.fee_usd);
-const best = cheapestNetwork(N);
-const btc = N.networks.bitcoin;
-const combos = (amount: number) => Object.entries(M.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, pct: (c.fee / amount) * 100, min: c.min }))).filter((x) => x.min == null || x.min <= amount).sort((a, b) => a.fee - b.fee).slice(0, 3);
-const L = (p: string) => `/${lang}${p}`;
 ---
-<Layout lang={lang} title={t(lang, 'hub.title')} description={t(lang, 'site.tagline')} path={L('/')} og="/og/hub.png">
-  <div class="hero">
-    <p class="eyebrow">{t(lang, 'nav.home')} · {t(lang, 'updated', { time: fmtTime(lang, N.generated_at) })}</p>
-    <h1>{t(lang, 'hub.h1')}</h1>
-    <p class="lead">{t(lang, 'hub.intro')}</p>
-    {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
-  </div>
-  <div class="grid">
-    {sorted.map((n, i) => <a class={'card' + (i === 0 ? ' rank-1' : '')} href={L(`/networks/${n.id}/`)} style="text-decoration:none;color:inherit">
-      <div class="name">{n.name}</div>
-      <div class="fee" data-live-fee={n.id}>{fmtUsd(lang, n.fee_usd)}</div>
-      <div class="sub num">{fmtNum(lang, n.fee_native)} {n.native} · {t(lang, 'minutes', { n: n.eta_min })}{n.stale && <span class="stale"> · {t(lang, 'stale', { time: n.observed_at.slice(0, 16).replace('T', ' ') })}</span>}</div>
-      <Sparkline points={N.sparklines_7d[n.id] || []} label={t(lang, 'hub.trend7d')} />
-    </a>)}
-  </div>
-  <div class="two" style="margin-top:20px">
-    <div class="note"><strong>{t(lang, 'wallet_vs_exchange.title')}</strong><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.wallet')}</p><p style="margin:6px 0 0">{t(lang, 'wallet_vs_exchange.exchange')}</p></div>
-    {btc && <div class="card"><div class="name">{t(lang, 'hub.btc_title')}</div><div class="sub">{t(lang, 'hub.btc_intro', { vbytes: btc.breakdown.tx_vbytes })}</div>
-      <dl class="kv num" style="margin-top:8px"><dt>{t(lang, 'hub.btc_fastest')}</dt><dd>{fmtUsd(lang, btc.cases_usd.fastest_btc)}</dd><dt>{t(lang, 'hub.btc_half_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.half_hour_btc)}</dd><dt>{t(lang, 'hub.btc_hour')}</dt><dd>{fmtUsd(lang, btc.cases_usd.hour_btc)}</dd><dt>{t(lang, 'hub.btc_economy')}</dt><dd>{fmtUsd(lang, btc.cases_usd.economy_btc)}</dd></dl>
-      <p class="meta"><a href={L('/networks/bitcoin/')}>{btc.name}</a></p></div>}
-  </div>
-  <h2>{t(lang, 'hub.exchange_title')}</h2>
-  <p class="lead">{t(lang, 'hub.exchange_intro')}</p>
-  <div class="scroll"><table><thead><tr><th>{t(lang, 'hub.network')}</th><th>{t(lang, 'hub.cheapest_exchange')}</th><th class="num">{t(lang, 'hub.fee')}</th></tr></thead><tbody>
-    {M.networks.map((n: string) => { const c = M.cheapest_per_network[n]; return <tr><td><a href={L(`/networks/${n}/`)}>{N.networks[n]?.name ?? n}</a></td><td>{c ? <a href={L(`/exchanges/${c.exchange}/`)}>{M.exchanges[c.exchange].name}</a> : <span class="meta">{t(lang, 'hub.no_data')}</span>}</td><td class="num">{c ? `${fmtNum(lang, c.fee)} USDT` : '–'}</td></tr>; })}
-  </tbody></table></div>
-  <p class="meta"><a href={L('/compare/usdt-withdrawal-fees/')}>{t(lang, 'compare.h1')} →</a></p>
-  {[100, 1000, 10000].map((amt) => { const c = combos(amt); return c.length ? <div><h2>{t(lang, 'hub.best_combo', { amount: t(lang, `amount.${amt}`) })}</h2><p class="lead">{t(lang, 'hub.combo_intro')}</p>
-    <div class="tbl"><table><tbody>{c.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{N.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} USDT</td><td class="num">{x.pct.toFixed(2)}%</td></tr>)}</tbody></table></div></div> : null; })}
-</Layout>
+<Hub lang={lang} asset={defaultAsset().id} path={`/${lang}/`} />

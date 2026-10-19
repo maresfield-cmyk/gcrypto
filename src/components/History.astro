@@ -1,0 +1,24 @@
+---
+import Layout from './Layout.astro';
+import Chart from './Chart.astro';
+import AssetPicker from './AssetPicker.astro';
+import { t, fees, history, fmtUsd, fmtDate } from '../data';
+interface Props { lang: string; asset: string; path: string }
+const { lang, asset, path } = Astro.props;
+const F = fees(), A = F.assets[asset], rows = history().filter((r) => r.asset === asset);
+const L = (p: string) => `/${lang}${p}`;
+const weekOf = (ts: string) => { const d = new Date(ts); const day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day); return d.toISOString().slice(0, 10); };
+const weeks: Record<string, Record<string, number[]>> = {};
+for (const r of rows) { (weeks[weekOf(r.ts)] ??= {})[r.network] ??= []; weeks[weekOf(r.ts)][r.network].push(r.fee_usd); }
+const winners = Object.entries(weeks).sort().reverse().map(([w, m]) => { const avg = Object.entries(m).map(([n, v]) => [n, v.reduce((a, b) => a + b, 0) / v.length] as [string, number]).sort((a, b) => a[1] - b[1]); return { week: w, network: avg[0][0], avg: avg[0][1] }; });
+const [h1a, h1b] = t(lang, 'history.h1', { asset: '\u0000' }).split('\u0000');
+---
+<Layout lang={lang} title={t(lang, 'history.title')} description={t(lang, 'history.h1', { asset: A.symbol })} path={path} updated={F.generated_at} crumbs={[{ name: t(lang, 'history.title'), path }]}>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.history')}</p><h1 aria-label={t(lang, 'history.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} route="history" />{h1b}</h1></div>
+  <h2>{t(lang, 'history.weekly')}</h2>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'history.week')}</th><th>{t(lang, 'history.winner')}</th><th class="num">{t(lang, 'history.avg')}</th></tr></thead><tbody>
+    {winners.map((w) => <tr><td>{fmtDate(lang, w.week)}</td><td><a href={L(`/networks/${w.network}/`)}>{F.networks[w.network].name}</a></td><td class="num">{fmtUsd(lang, w.avg)}</td></tr>)}
+    {!winners.length && <tr><td colspan="3" class="meta">{t(lang, 'hub.no_data')}</td></tr>}
+  </tbody></table></div>
+  {Object.values(A.networks).map((n: any) => { const r = rows.filter((x) => x.network === n.network); return <div><h2><a href={L(`/networks/${n.network}/`)}>{n.name}</a></h2>{r.length ? <Chart lang={lang} rows={r} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}</div>; })}
+</Layout>

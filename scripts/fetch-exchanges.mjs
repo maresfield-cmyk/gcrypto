@@ -11,12 +11,13 @@ import { bybit } from '../src/fetch/exchanges/bybit.mjs';
 import { okx } from '../src/fetch/exchanges/okx.mjs';
 import { unmapped, NETWORK_IDS } from '../src/lib/normalise.mjs';
 if (fs.existsSync('.env')) for (const l of fs.readFileSync('.env', 'utf8').split('\n')) { const m = l.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; }
-const ASSETS = ['USDT', 'BTC'], OUT = 'data/out/exchanges.json', now = new Date().toISOString();
-const CAP = { USDT: 50, BTC: 0.01 };                       // sanity caps per asset
+const ASSET_CFG = JSON.parse(fs.readFileSync('config/assets.json')).assets;
+const ASSETS = ASSET_CFG.map((a) => a.symbol), OUT = 'data/out/exchanges.json', now = new Date().toISOString();
+const CAP_USD = 60;                                        // sanity cap per row, in USD
 const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT)) : { exchanges: {} };
 const facts = YAML.parse(fs.readFileSync('data/manual/exchanges.yml', 'utf8')).exchanges;
-const net = JSON.parse(fs.readFileSync('data/out/networks.json')).networks;   // for USD conversion of BTC fees
-const prices = JSON.parse(fs.readFileSync('data/out/networks.json')).prices.usd;
+const FEES = JSON.parse(fs.readFileSync('data/out/fees.json')), prices = FEES.prices.usd;
+const priceOf = (sym) => { const a = ASSET_CFG.find((x) => x.symbol === sym); return a ? prices[a.coingecko] ?? null : null; };
 const alerts = [], out = { generated_at: now, exchanges: {}, alerts };
 const API = { kucoin, bitget, binance, bybit, okx };
 // manual sheet
@@ -46,29 +47,33 @@ for (const [ex, f] of Object.entries(facts)) {
     }
   }
   rec.rows = dedupe(rec.rows);
-  for (const r of rec.rows) r.fee_usd = r.fee == null ? null : r.fee_asset === 'USDT' ? r.fee : r.fee_asset === 'BTC' ? r.fee * (prices.bitcoin || 0) : null;
+  for (const r of rec.rows) { r.fee_usd = r.fee == null || priceOf(r.fee_asset) == null ? null : r.fee * priceOf(r.fee_asset); if (r.fee_usd != null && r.fee_usd > CAP_USD) r.flags.push('fee_above_cap'); }
   out.exchanges[ex] = rec;
 }
 // an exchange can list one network twice (KuCoin: TON and TON2): keep the row that is open for withdrawals, then the cheapest
 function dedupe(rows) { const m = new Map(); for (const r of rows) { const k = r.asset + '|' + r.network, o = m.get(k); if (!o || (r.withdraw_enabled && !o.withdraw_enabled) || (r.withdraw_enabled === o.withdraw_enabled && r.fee != null && (o.fee == null || r.fee < o.fee))) m.set(k, r); } return [...m.values()]; }
-function validate(r) { const f = []; if (!(r.fee >= 0)) f.push('negative_or_missing_fee'); if (r.fee > (CAP[r.fee_asset] ?? 50)) f.push('fee_above_cap'); return f; }
+function validate(r) { const f = []; if (!(r.fee >= 0)) f.push('negative_or_missing_fee'); return f; }
 if (unmapped.length) alerts.push({ type: 'unmapped_network_names', detail: unmapped.map((u) => `${u.exchange}: "${u.name}"`).join('; '), at: now });
 fs.writeFileSync('data/out/unmapped.json', JSON.stringify(unmapped, null, 1));
-// USDT matrix: exchange x network -> fee (USDT), min, enabled; null = not offered / unknown
-const trackedNets = Object.keys(net).filter((n) => net[n].token === 'USDT');
-const matrix = { generated_at: now, networks: trackedNets, exchanges: {} };
-for (const [ex, rec] of Object.entries(out.exchanges)) {
-  matrix.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(trackedNets.map((n) => { const r = rec.rows.find((x) => x.asset === 'USDT' && x.network === n); return [n, r ? { fee: r.fee, min: r.min, enabled: r.withdraw_enabled, flags: r.flags, last_verified: r.last_verified || r.observed_at } : null]; })) };
+// one matrix per asset: exchange x network -> fee (in the asset), min, enabled; null = not offered / unknown
+const matrix = { generated_at: now, assets: {} };
+for (const a of ASSET_CFG) {
+  const nets = Object.keys(a.on);
+  const m = { symbol: a.symbol, name: a.name, networks: nets, exchanges: {} };
+  for (const [ex, rec] of Object.entries(out.exchanges)) {
+    m.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(nets.map((n) => { const r = rec.rows.find((x) => x.asset === a.symbol && x.network === n); return [n, r ? { fee: r.fee, fee_usd: r.fee_usd, min: r.min, enabled: r.withdraw_enabled, flags: r.flags, last_verified: r.last_verified || r.observed_at } : null]; })) };
+  }
+  m.cheapest_per_network = Object.fromEntries(nets.map((n) => { const c = Object.entries(m.exchanges).map(([ex, e]) => [ex, e.cells[n]]).filter(([, v]) => v && v.enabled && v.fee != null && !v.flags.length).sort((x, y) => x[1].fee - y[1].fee); return [n, c.length ? { exchange: c[0][0], fee: c[0][1].fee, fee_usd: c[0][1].fee_usd } : null]; }));
+  matrix.assets[a.id] = m;
 }
-// cheapest exchange per network (enabled, valid, filled-in rows only)
-matrix.cheapest_per_network = Object.fromEntries(trackedNets.map((n) => { const c = Object.entries(matrix.exchanges).map(([ex, e]) => [ex, e.cells[n]]).filter(([, v]) => v && v.enabled && v.fee != null && !v.flags.length).sort((a, b) => a[1].fee - b[1].fee); return [n, c.length ? { exchange: c[0][0], fee: c[0][1].fee } : null]; }));
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1));
-fs.writeFileSync('data/out/usdt-matrix.json', JSON.stringify(matrix, null, 1));
+fs.writeFileSync('data/out/matrix.json', JSON.stringify(matrix, null, 1));
 fs.writeFileSync('data/out/alerts-exchanges.json', JSON.stringify(alerts, null, 1));
 // console summary
-console.log('USDT withdrawal fee matrix (fee in USDT; - = not offered; ? = not filled in; * = stale/no key):');
-console.log('exchange  '.padEnd(11) + trackedNets.map((n) => n.slice(0, 8).padStart(9)).join(''));
-for (const [ex, e] of Object.entries(matrix.exchanges)) console.log((ex + (e.stale || e.fee_source === 'manual' && !e.cells ? '*' : '')).padEnd(11) + trackedNets.map((n) => { const v = e.cells[n]; return (v == null ? '-' : v.fee == null ? '?' : (v.enabled ? '' : '(off)') + String(v.fee)).padStart(9); }).join('') + (e.stale ? '  * ' + e.note : ''));
-console.log('\ncheapest per network:', JSON.stringify(matrix.cheapest_per_network));
-console.log('unmapped names:', unmapped.length ? JSON.stringify(unmapped) : 'none');
+for (const [aid, m] of Object.entries(matrix.assets)) {
+  console.log(`\n${m.symbol} withdrawal fees (in ${m.symbol}; - = not offered; ? = not filled in; * = stale/no key):`);
+  console.log('exchange  '.padEnd(11) + m.networks.map((n) => n.slice(0, 8).padStart(9)).join(''));
+  for (const [ex, e] of Object.entries(m.exchanges)) console.log((ex + (e.stale ? '*' : '')).padEnd(11) + m.networks.map((n) => { const v = e.cells[n]; return (v == null ? '-' : v.fee == null ? '?' : (v.enabled ? '' : '(off)') + String(v.fee)).padStart(9); }).join(''));
+}
+console.log('\nunmapped names:', unmapped.length ? JSON.stringify(unmapped) : 'none');
 console.log('alerts:', alerts.length, alerts.map((a) => a.type + (a.exchange ? ':' + a.exchange : '')).join(', '));

@@ -1,30 +1,134 @@
 {
-  "_doc": "One entry per network. 'confirmations' = what major exchanges require before crediting a deposit (count, source, last_verified); block_time_s and these give the time estimate. sanity_cap_usd = a fee above this is rejected as bad data. Keep 'source' URLs current.",
+  "_doc": "One entry per network (the chains). What is priced on each chain is in config/assets.json. 'confirmations' = what major exchanges require before crediting a deposit (count, source, last_verified); block_time_s and these give the time estimate. sanity_cap_usd = a fee above this is rejected as bad data.",
   "networks": [
-    { "id": "tron", "name": "Tron (TRC-20)", "token": "USDT", "native": "TRX", "coingecko": "tron", "binance_symbol": "TRXUSDT", "block_time_s": 3, "sanity_cap_usd": 25,
-      "usdt_contract": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-      "confirmations": { "count": 19, "source": "https://www.kucoin.com (API: confirms for TRC20 = 3; Binance lists 19 for TRX network deposits)", "last_verified": "2026-10-19" } },
-    { "id": "ethereum", "name": "Ethereum (ERC-20)", "token": "USDT", "native": "ETH", "coingecko": "ethereum", "binance_symbol": "ETHUSDT", "block_time_s": 12, "sanity_cap_usd": 60,
-      "rpc": "https://ethereum-rpc.publicnode.com", "usdt_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "gas_fallback": 65000,
-      "confirmations": { "count": 12, "source": "Binance deposit page lists 6-12 for ETH network; KuCoin API: 64", "last_verified": "2026-10-19" } },
-    { "id": "solana", "name": "Solana (SPL)", "token": "USDT", "native": "SOL", "coingecko": "solana", "binance_symbol": "SOLUSDT", "block_time_s": 0.4, "sanity_cap_usd": 3,
-      "rpc": "https://api.mainnet-beta.solana.com", "usdt_mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", "compute_units": 200000,
-      "confirmations": { "count": 32, "source": "finalized ≈ 32 slots; Bitget API: 5", "last_verified": "2026-10-19" } },
-    { "id": "bsc", "name": "BNB Smart Chain (BEP-20)", "token": "USDT", "native": "BNB", "coingecko": "binancecoin", "binance_symbol": "BNBUSDT", "block_time_s": 0.75, "sanity_cap_usd": 3,
-      "rpc": "https://bsc-rpc.publicnode.com", "usdt_contract": "0x55d398326f99059fF775485246999027B3197955", "gas_fallback": 60000,
-      "confirmations": { "count": 15, "source": "Bitget API: deposit 15; KuCoin: 60", "last_verified": "2026-10-19" } },
-    { "id": "polygon", "name": "Polygon PoS", "token": "USDT", "native": "POL", "coingecko": "polygon-ecosystem-token", "binance_symbol": "POLUSDT", "block_time_s": 2, "sanity_cap_usd": 2,
-      "rpc": "https://polygon-bor-rpc.publicnode.com", "usdt_contract": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", "gas_fallback": 60000,
-      "confirmations": { "count": 60, "source": "Bitget API: deposit 60; KuCoin: 300", "last_verified": "2026-10-19" } },
-    { "id": "arbitrum", "name": "Arbitrum One", "token": "USDT", "native": "ETH", "coingecko": "ethereum", "binance_symbol": "ETHUSDT", "block_time_s": 0.25, "sanity_cap_usd": 3,
-      "rpc": "https://arb1.arbitrum.io/rpc", "usdt_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", "gas_fallback": 60000,
-      "confirmations": { "count": 12, "source": "Bitget API: deposit 12", "last_verified": "2026-10-19" } },
-    { "id": "ton", "name": "TON (jetton)", "token": "USDT", "native": "TON", "coingecko": "the-open-network", "binance_symbol": "TONUSDT", "block_time_s": 5, "sanity_cap_usd": 3,
-      "usdt_master": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs", "traces_sample": 10,
-      "confirmations": { "count": 1, "source": "Bitget API: deposit 10 (blocks); KuCoin: 1", "last_verified": "2026-10-19" } },
-    { "id": "bitcoin", "name": "Bitcoin", "token": "BTC", "native": "BTC", "coingecko": "bitcoin", "binance_symbol": "BTCUSDT", "block_time_s": 600, "sanity_cap_usd": 60,
+    {
+      "id": "tron",
+      "name": "Tron (TRC-20)",
+      "native": "TRX",
+      "coingecko": "tron",
+      "binance_symbol": "TRXUSDT",
+      "block_time_s": 3,
+      "sanity_cap_usd": 25,
+      "confirmations": {
+        "count": 19,
+        "source": "https://www.kucoin.com (API: confirms for TRC20 = 3; Binance lists 19 for TRX network deposits)",
+        "last_verified": "2026-10-19"
+      },
+      "gas_fallback": null
+    },
+    {
+      "id": "ethereum",
+      "name": "Ethereum (ERC-20)",
+      "native": "ETH",
+      "coingecko": "ethereum",
+      "binance_symbol": "ETHUSDT",
+      "block_time_s": 12,
+      "sanity_cap_usd": 60,
+      "rpc": "https://ethereum-rpc.publicnode.com",
+      "gas_fallback": 65000,
+      "confirmations": {
+        "count": 12,
+        "source": "Binance deposit page lists 6-12 for ETH network; KuCoin API: 64",
+        "last_verified": "2026-10-19"
+      }
+    },
+    {
+      "id": "solana",
+      "name": "Solana (SPL)",
+      "native": "SOL",
+      "coingecko": "solana",
+      "binance_symbol": "SOLUSDT",
+      "block_time_s": 0.4,
+      "sanity_cap_usd": 3,
+      "rpc": "https://api.mainnet-beta.solana.com",
+      "compute_units": 200000,
+      "confirmations": {
+        "count": 32,
+        "source": "finalized \u2248 32 slots; Bitget API: 5",
+        "last_verified": "2026-10-19"
+      },
+      "gas_fallback": null
+    },
+    {
+      "id": "bsc",
+      "name": "BNB Smart Chain (BEP-20)",
+      "native": "BNB",
+      "coingecko": "binancecoin",
+      "binance_symbol": "BNBUSDT",
+      "block_time_s": 0.75,
+      "sanity_cap_usd": 3,
+      "rpc": "https://bsc-rpc.publicnode.com",
+      "gas_fallback": 60000,
+      "confirmations": {
+        "count": 15,
+        "source": "Bitget API: deposit 15; KuCoin: 60",
+        "last_verified": "2026-10-19"
+      }
+    },
+    {
+      "id": "polygon",
+      "name": "Polygon PoS",
+      "native": "POL",
+      "coingecko": "polygon-ecosystem-token",
+      "binance_symbol": "POLUSDT",
+      "block_time_s": 2,
+      "sanity_cap_usd": 2,
+      "rpc": "https://polygon-bor-rpc.publicnode.com",
+      "gas_fallback": 60000,
+      "confirmations": {
+        "count": 60,
+        "source": "Bitget API: deposit 60; KuCoin: 300",
+        "last_verified": "2026-10-19"
+      }
+    },
+    {
+      "id": "arbitrum",
+      "name": "Arbitrum One",
+      "native": "ETH",
+      "coingecko": "ethereum",
+      "binance_symbol": "ETHUSDT",
+      "block_time_s": 0.25,
+      "sanity_cap_usd": 3,
+      "rpc": "https://arb1.arbitrum.io/rpc",
+      "gas_fallback": 60000,
+      "confirmations": {
+        "count": 12,
+        "source": "Bitget API: deposit 12",
+        "last_verified": "2026-10-19"
+      }
+    },
+    {
+      "id": "ton",
+      "name": "TON (jetton)",
+      "native": "TON",
+      "coingecko": "the-open-network",
+      "binance_symbol": "TONUSDT",
+      "block_time_s": 5,
+      "sanity_cap_usd": 3,
+      "traces_sample": 10,
+      "confirmations": {
+        "count": 1,
+        "source": "Bitget API: deposit 10 (blocks); KuCoin: 1",
+        "last_verified": "2026-10-19"
+      },
+      "gas_fallback": null
+    },
+    {
+      "id": "bitcoin",
+      "name": "Bitcoin",
+      "native": "BTC",
+      "coingecko": "bitcoin",
+      "binance_symbol": "BTCUSDT",
+      "block_time_s": 600,
+      "sanity_cap_usd": 60,
       "tx_vbytes": 140,
-      "confirmations": { "count": 2, "source": "Binance credits BTC after 1 confirmation, unlocks at 2 (deposit page)", "last_verified": "2026-10-19" } }
+      "confirmations": {
+        "count": 2,
+        "source": "Binance credits BTC after 1 confirmation, unlocks at 2 (deposit page)",
+        "last_verified": "2026-10-19"
+      },
+      "gas_fallback": null
+    }
   ],
   "price_max_age_s": 3600,
   "anomaly_multiple": 10,

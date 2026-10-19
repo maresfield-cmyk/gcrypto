@@ -1,34 +1,40 @@
 ---
 import Layout from '../../../components/Layout.astro';
 import Chart from '../../../components/Chart.astro';
-import { LANGS, t, networks, matrix, history, fmtUsd, fmtNum, fmtTime, fmtDate } from '../../../data';
-export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(networks().networks).map((network) => ({ params: { lang, network } })));
+import { LANGS, t, fees, matrix, history, netConfig, fmtUsd, fmtNum, fmtTime, fmtDate, defaultAsset } from '../../../data';
+export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(fees().networks).map((network) => ({ params: { lang, network } })));
 const { lang, network } = Astro.params;
-const N = networks(), M = matrix(), n = N.networks[network];
-const rows = history().filter((r) => r.network === network);
+const F = fees(), M = matrix(), N = F.networks[network], cfg = netConfig().find((c: any) => c.id === network);
+const onHere = Object.values(F.assets).filter((a: any) => a.networks[network]) as any[];
+const main = onHere.find((a) => a.default) ?? onHere[0];
+const n = main.networks[network];
+const rows = history().filter((r) => r.asset === main.id && r.network === network);
 const L = (p: string) => `/${lang}${p}`;
-const offers = Object.entries(M.exchanges).map(([id, e]: any) => ({ id, name: e.name, cell: e.cells[network] })).filter((x) => x.cell && x.cell.fee != null).sort((a, b) => a.cell.fee - b.cell.fee);
-const skip = new Set(['note']);
+const offers = Object.entries(M.assets[main.id].exchanges).map(([id, e]: any) => ({ id, name: e.name, cell: e.cells[network] })).filter((x) => x.cell && x.cell.fee != null).sort((a, b) => a.cell.fee - b.cell.fee);
+const skip = new Set(['note', 'estimation_wallet']);
 ---
-<Layout lang={lang} title={t(lang, 'net.title', { network: n.name })} description={`${n.name}: ${fmtUsd(lang, n.fee_usd)} per USDT transfer right now, how it is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/${network}.png`} updated={N.generated_at} crumbs={[{ name: n.name, path: L(`/networks/${network}/`) }]}>
-  <div class="hero"><p class="eyebrow">{n.token} · {n.name}</p>
-  <h1>{t(lang, 'net.h1', { network: n.name })}</h1></div>
+<Layout lang={lang} title={t(lang, 'net.title', { network: N.name })} description={`${N.name}: ${fmtUsd(lang, n.fee_usd)} per ${main.symbol} transfer right now, every asset on this chain, how the fee is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/net-${network}.png`} updated={F.generated_at} crumbs={[{ name: N.name, path: L(`/networks/${network}/`) }]}>
+  <div class="hero"><p class="eyebrow">{main.symbol} · {N.name}</p><h1>{t(lang, 'net.h1', { network: N.name })}</h1></div>
   <div class="grid">
-    <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={n.id}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
-    <div class="card"><div class="sub">{t(lang, 'net.native_fee', { native: n.native })}</div><div class="fee num">{fmtNum(lang, n.fee_native)}</div><div class="sub">1 {n.native} = {fmtUsd(lang, n.price_usd, 2)}</div></div>
-    <div class="card"><div class="sub">{t(lang, 'net.time')}</div><div class="fee">{t(lang, 'minutes', { n: n.eta_min })}</div><div class="sub">{t(lang, 'net.time_detail', { blocks: n.confirmations.count, block_time: n.confirmations && N.networks[network] ? (await import('../../../data')).netConfig().find((c: any) => c.id === network).block_time_s : '' })}</div></div>
+    <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={`${main.id}:${network}`}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
+    <div class="card"><div class="sub">{t(lang, 'net.native_fee', { native: N.native })}</div><div class="fee num">{fmtNum(lang, n.fee_native)}</div><div class="sub">1 {N.native} = {fmtUsd(lang, n.price_usd, 2)}</div></div>
+    <div class="card"><div class="sub">{t(lang, 'net.time')}</div><div class="fee">{t(lang, 'minutes', { n: n.eta_min })}</div><div class="sub">{t(lang, 'net.time_detail', { blocks: N.confirmations.count, block_time: cfg.block_time_s })}</div></div>
   </div>
-  {n.cases_usd && <div><h2>{t(lang, 'net.cases')}</h2><div class="tbl"><table><tbody>{Object.entries(n.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <tr><td>{t(lang, `case.${k}`)}</td><td class="num">{fmtUsd(lang, v)}</td></tr>)}</tbody></table></div></div>}
+  <h2>{t(lang, 'net.assets', { network: N.name })}</h2>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'net.asset')}</th><th class="num">{t(lang, 'hub.fee')}</th><th class="num">≈ USD</th><th class="num">{t(lang, 'hub.time')}</th></tr></thead><tbody>
+    {onHere.map((a) => { const c = a.networks[network]; return <tr><td><a href={a.default ? L('/') : L(`/assets/${a.id}/`)} style="display:inline-flex;align-items:center;gap:8px"><img src={`/coins/${a.id}.svg`} alt="" width="20" height="20" style="border-radius:50%">{a.symbol}</a> <span class="meta">{a.name}</span></td><td class="num">{c.fee_usd == null ? '–' : `${fmtNum(lang, c.fee_native)} ${N.native}`}</td><td class={'num' + (a.id === main.id ? ' best' : '')} data-live-fee={`${a.id}:${network}`}>{fmtUsd(lang, c.fee_usd)}</td><td class="num">{t(lang, 'minutes', { n: c.eta_min })}</td></tr>; })}
+  </tbody></table></div>
+  {n.cases_usd && <div><h2>{t(lang, 'hub.cases_title', { asset: main.symbol, network: N.name })}</h2><div class="tbl"><table><tbody>{Object.entries(n.cases_usd).filter(([, v]) => typeof v === 'number').map(([k, v]: any) => <tr><td>{t(lang, `case.${k}`)}</td><td class="num">{fmtUsd(lang, v)}</td></tr>)}</tbody></table></div></div>}
   <h2>{t(lang, 'net.how_made')}</h2>
   <dl class="kv num">{Object.entries(n.breakdown).filter(([k]) => !skip.has(k)).map(([k, v]: any) => <><dt>{k.replace(/_/g, ' ')}</dt><dd>{typeof v === 'number' ? fmtNum(lang, v) : typeof v === 'object' ? Object.entries(v).map(([kk, vv]: any) => `${kk}: ${typeof vv === 'number' ? fmtNum(lang, vv) : vv}`).join(' · ') : String(v)}</dd></>)}</dl>
-  {n.breakdown.note && <p class="note">{n.breakdown.note}</p>}
+  {n.breakdown.note && <p class="note" style="margin-top:12px">{n.breakdown.note}</p>}
   <p class="meta">{t(lang, 'source')}: {n.source}</p>
-  <h2>{t(lang, 'net.chart7')}</h2>
-  {rows.length ? <Chart lang={lang} rows={rows} days={7} title={t(lang, 'net.chart7')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, N.generated_at) })}</p>}
-  <h2>{t(lang, 'net.chart30')}</h2>
-  {rows.length ? <Chart lang={lang} rows={rows} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, N.generated_at) })}</p>}
-  {n.token === 'USDT' && <div><h2>{t(lang, 'net.exchanges', { network: n.name })}</h2>
+  <h2>{t(lang, 'net.chart7')} · {main.symbol}</h2>
+  {rows.length ? <Chart lang={lang} rows={rows} days={7} title={t(lang, 'net.chart7')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}
+  <h2>{t(lang, 'net.chart30')} · {main.symbol}</h2>
+  {rows.length ? <Chart lang={lang} rows={rows} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}
+  {offers.length > 0 && <div><h2>{t(lang, 'net.exchanges', { network: N.name })} · {main.symbol}</h2>
     <div class="tbl"><table><thead><tr><th>{t(lang, 'compare.exchange')}</th><th class="num">{t(lang, 'ex.fee')}</th><th class="num">{t(lang, 'ex.min')}</th><th>{t(lang, 'ex.status')}</th></tr></thead><tbody>
-      {offers.map((o, i) => <tr><td><a href={L(`/exchanges/${o.id}/`)}>{o.name}</a></td><td class={'num' + (i === 0 ? ' best' : '')}>{fmtNum(lang, o.cell.fee)} USDT</td><td class="num">{o.cell.min != null ? fmtNum(lang, o.cell.min) : '–'}</td><td><span class={'pill ' + (o.cell.enabled ? 'good' : 'bad')}>{t(lang, o.cell.enabled ? 'ex.open' : 'ex.closed')}</span></td></tr>)}
+      {offers.map((o, i) => <tr><td><a href={L(`/exchanges/${o.id}/`)}>{o.name}</a></td><td class={'num' + (i === 0 ? ' best' : '')}>{fmtNum(lang, o.cell.fee)} {main.symbol}</td><td class="num">{o.cell.min != null ? fmtNum(lang, o.cell.min) : '–'}</td><td><span class={'pill ' + (o.cell.enabled ? 'good' : 'bad')}>{t(lang, o.cell.enabled ? 'ex.open' : 'ex.closed')}</span></td></tr>)}
     </tbody></table></div></div>}
 </Layout>

@@ -1,0 +1,7 @@
+---
+import History from '../../../components/History.astro';
+import { LANGS, defaultAsset } from '../../../data';
+export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
+const { lang } = Astro.params;
+---
+<History lang={lang} asset={defaultAsset().id} path={`/${lang}/history/`} />
