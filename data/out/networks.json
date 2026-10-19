@@ -1,0 +1,464 @@
+{
+ "generated_at": "2026-10-19T17:52:38.240Z",
+ "prices": {
+  "observed_at": "2026-10-19T17:50:10.946Z",
+  "source": "https://api.coingecko.com/api/v3/simple/price",
+  "usd": {
+   "tron": 0.331024,
+   "ethereum": 2394.14,
+   "solana": 103.9,
+   "binancecoin": 726.33,
+   "polygon-ecosystem-token": 0.091859,
+   "the-open-network": 1.35,
+   "bitcoin": 81822
+  }
+ },
+ "networks": {
+  "tron": {
+   "id": "tron",
+   "name": "Tron (TRC-20)",
+   "token": "USDT",
+   "native": "TRX",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 6.4285,
+   "fee_usd": 2.1279877839999997,
+   "price_usd": 0.331024,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "existing_recipient": {
+     "energy": 64285,
+     "energy_penalty": 49635,
+     "fee_trx": 6.4285
+    },
+    "new_recipient": {
+     "energy": 130285,
+     "energy_penalty": 100635,
+     "fee_trx": 13.0285
+    },
+    "bandwidth_if_no_free_quota_trx": 0.345
+   },
+   "breakdown": {
+    "energy_price_sun": 100,
+    "bandwidth_price_sun_per_byte": 1000,
+    "tx_bytes": 345,
+    "note": "Energy burned as TRX. Staking TRX for energy makes the transfer nearly free; most users do not."
+   },
+   "eta_min": 1,
+   "confirmations": {
+    "count": 19,
+    "source": "https://www.kucoin.com (API: confirms for TRC20 = 3; Binance lists 19 for TRX network deposits)",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://api.trongrid.io (getchainparameters, triggerconstantcontract)",
+   "raw": [
+    "data/raw/tron-chainparameters/latest.json",
+    "data/raw/tron-energy-existing/latest.json",
+    "data/raw/tron-energy-new/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "existing_recipient": 2.1279877839999997,
+    "new_recipient": 4.312746184,
+    "bandwidth_if_no_free_quota_trx": 0.11420327999999999
+   }
+  },
+  "ethereum": {
+   "id": "ethereum",
+   "name": "Ethereum (ERC-20)",
+   "token": "USDT",
+   "native": "ETH",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.0000118397490507,
+   "fee_usd": 0.028346016792242894,
+   "price_usd": 2394.14,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "existing_recipient": 0.0000118397490507,
+    "new_recipient": 0.0000162586076058,
+    "fast_90th_pct_tip": 0.000102473799004221
+   },
+   "breakdown": {
+    "base_fee_gwei": 0.204733299,
+    "priority_tip_gwei": 0.050000001,
+    "tip_90th_pct_gwei": 2,
+    "gas_new_recipient": 63826,
+    "gas_price_gwei": 0.2547333,
+    "gas_price_source": "eth_feeHistory base + p50 tip",
+    "gas": 46479,
+    "gas_source": "eth_estimateGas",
+    "note": ""
+   },
+   "eta_min": 2,
+   "confirmations": {
+    "count": 12,
+    "source": "Binance deposit page lists 6-12 for ETH network; KuCoin API: 64",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://ethereum-rpc.publicnode.com (eth_feeHistory, eth_estimateGas)",
+   "raw": [
+    "data/raw/evm-ethereum-feehistory/latest.json",
+    "data/raw/evm-ethereum-estimategas/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "existing_recipient": 0.028346016792242894,
+    "new_recipient": 0.03892538281335001,
+    "fast_90th_pct_tip": 0.24533662114796564
+   }
+  },
+  "solana": {
+   "id": "solana",
+   "name": "Solana (SPL)",
+   "token": "USDT",
+   "native": "SOL",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.000005,
+   "fee_usd": 0.0005195000000000001,
+   "price_usd": 103.9,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "new_recipient_rent_sol": 0.00148844
+   },
+   "breakdown": {
+    "base_fee_lamports": 5000,
+    "priority_fee_microlamports_per_cu": {
+     "p50": 0,
+     "p75": 0,
+     "p90": 0
+    },
+    "compute_units": 200000,
+    "tip_lamports": 0,
+    "samples": 150,
+    "note": "A first transfer to a wallet that has never held USDT also pays the token-account rent (refundable only by closing the account)."
+   },
+   "eta_min": 1,
+   "confirmations": {
+    "count": 32,
+    "source": "finalized ≈ 32 slots; Bitget API: 5",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://api.mainnet-beta.solana.com (getRecentPrioritizationFees, getMinimumBalanceForRentExemption)",
+   "raw": [
+    "data/raw/solana-priorityfees/latest.json",
+    "data/raw/solana-rent/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "new_recipient_rent_sol": 0.154648916
+   }
+  },
+  "bsc": {
+   "id": "bsc",
+   "name": "BNB Smart Chain (BEP-20)",
+   "token": "USDT",
+   "native": "BNB",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.0000017437,
+   "fee_usd": 0.001266501621,
+   "price_usd": 726.33,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "existing_recipient": 0.0000017437,
+    "new_recipient": 0.0000025902,
+    "fast_90th_pct_tip": 0.00000261555
+   },
+   "breakdown": {
+    "base_fee_gwei": 0,
+    "priority_tip_gwei": 0.05,
+    "tip_90th_pct_gwei": 0.075,
+    "gas_new_recipient": 51804,
+    "gas_price_gwei": 0.05,
+    "gas_price_source": "eth_feeHistory base + p50 tip",
+    "gas": 34874,
+    "gas_source": "eth_estimateGas",
+    "note": ""
+   },
+   "eta_min": 1,
+   "confirmations": {
+    "count": 15,
+    "source": "Bitget API: deposit 15; KuCoin: 60",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://bsc-rpc.publicnode.com (eth_feeHistory, eth_estimateGas)",
+   "raw": [
+    "data/raw/evm-bsc-feehistory/latest.json",
+    "data/raw/evm-bsc-estimategas/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "existing_recipient": 0.001266501621,
+    "new_recipient": 0.0018813399660000004,
+    "fast_90th_pct_tip": 0.0018997524315
+   }
+  },
+  "polygon": {
+   "id": "polygon",
+   "name": "Polygon PoS",
+   "token": "USDT",
+   "native": "POL",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.012494075609222478,
+   "fee_usd": 0.0011476932913875677,
+   "price_usd": 0.091859,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "existing_recipient": 0.012494075609222478,
+    "new_recipient": 0.01618833178802923,
+    "fast_90th_pct_tip": 0.016938059609222476
+   },
+   "breakdown": {
+    "base_fee_gwei": 127.424996099,
+    "priority_tip_gwei": 75,
+    "tip_90th_pct_gwei": 147,
+    "gas_new_recipient": 79972,
+    "gas_price_gwei": 202.424996099,
+    "gas_price_source": "eth_feeHistory base + p50 tip",
+    "gas": 61722,
+    "gas_source": "eth_estimateGas",
+    "note": ""
+   },
+   "eta_min": 2,
+   "confirmations": {
+    "count": 60,
+    "source": "Bitget API: deposit 60; KuCoin: 300",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://polygon-bor-rpc.publicnode.com (eth_feeHistory, eth_estimateGas)",
+   "raw": [
+    "data/raw/evm-polygon-feehistory/latest.json",
+    "data/raw/evm-polygon-estimategas/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "existing_recipient": 0.0011476932913875677,
+    "new_recipient": 0.001487043969716577,
+    "fast_90th_pct_tip": 0.0015559132176435674
+   }
+  },
+  "arbitrum": {
+   "id": "arbitrum",
+   "name": "Arbitrum One",
+   "token": "USDT",
+   "native": "ETH",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 9.03051694e-7,
+   "fee_usd": 0.00216203218267316,
+   "price_usd": 2394.14,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "existing_recipient": 9.03051694e-7,
+    "new_recipient": 0.00000125017451,
+    "fast_90th_pct_tip": 9.03051694e-7
+   },
+   "breakdown": {
+    "base_fee_gwei": 0.020014,
+    "priority_tip_gwei": 0,
+    "tip_90th_pct_gwei": 0,
+    "gas_new_recipient": 62465,
+    "gas_price_gwei": 0.020014,
+    "gas_price_source": "eth_gasPrice",
+    "gas": 45121,
+    "gas_source": "eth_estimateGas",
+    "note": "estimateGas on Arbitrum includes the L1 data cost."
+   },
+   "eta_min": 1,
+   "confirmations": {
+    "count": 12,
+    "source": "Bitget API: deposit 12",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://arb1.arbitrum.io/rpc (eth_feeHistory, eth_estimateGas)",
+   "raw": [
+    "data/raw/evm-arbitrum-feehistory/latest.json",
+    "data/raw/evm-arbitrum-estimategas/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "existing_recipient": 0.00216203218267316,
+    "new_recipient": 0.0029930928013714,
+    "fast_90th_pct_tip": 0.00216203218267316
+   }
+  },
+  "ton": {
+   "id": "ton",
+   "name": "TON (jetton)",
+   "token": "USDT",
+   "native": "TON",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.007298973,
+   "fee_usd": 0.009853613550000001,
+   "price_usd": 1.35,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": null,
+   "breakdown": {
+    "traces_sampled": 10,
+    "fee_ton_min": 0.006248566,
+    "fee_ton_median": 0.007298973,
+    "fee_ton_max": 0.008016329,
+    "note": "Sum of all network fees across one real USDT transfer (median of recent transfers). Wallets also attach ~0.05 TON that is mostly refunded."
+   },
+   "eta_min": 1,
+   "confirmations": {
+    "count": 1,
+    "source": "Bitget API: deposit 10 (blocks); KuCoin: 1",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://tonapi.io/v2 (blockchain/accounts/{USDT master}/transactions, traces/{hash})",
+   "raw": [
+    "data/raw/ton-master-txs/latest.json",
+    "data/raw/ton-trace/latest.json"
+   ],
+   "flags": []
+  },
+  "bitcoin": {
+   "id": "bitcoin",
+   "name": "Bitcoin",
+   "token": "BTC",
+   "native": "BTC",
+   "observed_at": "2026-10-19T17:52:38.240Z",
+   "fee_native": 0.0000028,
+   "fee_usd": 0.2291016,
+   "price_usd": 81822,
+   "price_source": "https://api.coingecko.com/api/v3/simple/price",
+   "cases": {
+    "fastest_btc": 0.0000028,
+    "half_hour_btc": 0.0000014,
+    "hour_btc": 0.0000014,
+    "economy_btc": 0.0000014
+   },
+   "breakdown": {
+    "sat_per_vbyte": {
+     "fastest": 2,
+     "half_hour": 1,
+     "hour": 1,
+     "economy": 1,
+     "minimum": 1
+    },
+    "tx_vbytes": 140,
+    "note": "Fee rates for the next block, ~30 min and ~60 min. Exchanges credit after 1-2 confirmations (10-20 min more)."
+   },
+   "eta_min": 20,
+   "confirmations": {
+    "count": 2,
+    "source": "Binance credits BTC after 1 confirmation, unlocks at 2 (deposit page)",
+    "last_verified": "2026-10-19"
+   },
+   "source": "https://mempool.space/api/v1/fees/recommended",
+   "raw": [
+    "data/raw/btc-fees/latest.json"
+   ],
+   "flags": [],
+   "cases_usd": {
+    "fastest_btc": 0.2291016,
+    "half_hour_btc": 0.1145508,
+    "hour_btc": 0.1145508,
+    "economy_btc": 0.1145508
+   }
+  }
+ },
+ "alerts": [],
+ "sparklines_7d": {
+  "tron": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    2.127988
+   ],
+   [
+    "2026-10-19T17:52:36.417Z",
+    2.127988
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    2.127988
+   ]
+  ],
+  "ethereum": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.021426
+   ],
+   [
+    "2026-10-19T17:52:36.417Z",
+    0.030262
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.028346
+   ]
+  ],
+  "solana": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.00052
+   ],
+   [
+    "2026-10-19T17:52:36.417Z",
+    0.00052
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.00052
+   ]
+  ],
+  "bsc": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.001267
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.001267
+   ]
+  ],
+  "polygon": [
+   [
+    "2026-10-19T17:52:36.417Z",
+    0.001151
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.001148
+   ]
+  ],
+  "arbitrum": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.002163
+   ],
+   [
+    "2026-10-19T17:52:36.417Z",
+    0.002166
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.002162
+   ]
+  ],
+  "ton": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.009854
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.009854
+   ]
+  ],
+  "bitcoin": [
+   [
+    "2026-10-19T17:50:10.940Z",
+    0.229102
+   ],
+   [
+    "2026-10-19T17:52:38.240Z",
+    0.229102
+   ]
+  ]
+ },
+ "rebuild": {
+  "needed": true,
+  "moved": [
+   "ethereum"
+  ]
+ }
+}
