@@ -11,8 +11,8 @@ const data = { networks: Object.fromEntries(Object.values(N.networks).map((n: an
 const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt', 'calc.alt_wallet', 'calc.min', 'calc.below_min', 'calc.not_offered', 'minutes'].map((k) => [k, t(lang, k)]));
 ---
 <Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.intro')} path={L('/calculator/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
-  <h1>{t(lang, 'calc.title')}</h1>
-  <p class="lead">{t(lang, 'calc.intro')}</p>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.calculator')}</p><h1>{t(lang, 'calc.title')}</h1>
+  <p class="lead">{t(lang, 'calc.intro')}</p></div>
   <form id="calc" class="card" style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end">
     <label>{t(lang, 'calc.amount')}<br><input id="amount" type="number" min="1" value="100" style="width:100%"></label>
     <label>{t(lang, 'calc.asset')}<br><select id="asset" style="width:100%"><option value="USDT">USDT</option><option value="BTC">BTC</option></select></label>

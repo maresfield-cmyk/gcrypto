@@ -9,17 +9,17 @@ const dataset = { '@context': 'https://schema.org', '@type': 'Dataset', name: t(
 const nets = Object.values(N.networks) as any[];
 ---
 <Layout lang={lang} title={t(lang, 'method.title')} description={t(lang, 'method.h1')} path={L('/methodology/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'method.title'), path: L('/methodology/') }]} jsonld={[dataset]}>
-  <h1>{t(lang, 'method.h1')}</h1>
-  <p class="lead">{t(lang, 'method.cadence')}</p>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.methodology')}</p><h1>{t(lang, 'method.h1')}</h1>
+  <p class="lead">{t(lang, 'method.cadence')}</p></div>
   <h2>Network fees</h2>
-  <table><thead><tr><th>Network</th><th>How the number is produced</th><th>Source</th></tr></thead><tbody>
+  <div class="tbl"><table><thead><tr><th>Network</th><th>How the number is produced</th><th>Source</th></tr></thead><tbody>
     {nets.map((n) => <tr><td><a href={L(`/networks/${n.id}/`)}>{n.name}</a></td><td>{n.breakdown.note || Object.keys(n.breakdown).filter((k) => k !== 'note').map((k) => k.replace(/_/g, ' ')).join(', ')}</td><td class="meta">{n.source}</td></tr>)}
-  </tbody></table>
+  </tbody></table></div>
   <p>Fee in USD = fee in the native coin × the coin's USD price (CoinGecko, cached 5 minutes; Binance and OKX tickers as fallbacks). Time to credit = the confirmations major exchanges require × block time, from <code>config/networks.json</code> with a source per row.</p>
   <h2>Exchange withdrawal fees</h2>
-  <table><thead><tr><th>Exchange</th><th>Method</th><th>Source</th></tr></thead><tbody>
+  <div class="tbl"><table><thead><tr><th>Exchange</th><th>Method</th><th>Source</th></tr></thead><tbody>
     {Object.entries(E.exchanges).map(([id, e]: any) => <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a></td><td>{e.fee_source === 'api' ? 'Exchange API, every 6 hours' : 'Checked by hand against the fee page, dated per row'}</td><td class="meta"><a href={e.fee_page} rel="nofollow noopener">{e.fee_page}</a></td></tr>)}
-  </tbody></table>
+  </tbody></table></div>
   <h2>Validation</h2>
   <ul><li>No negative fees; each network has a sanity cap; a price older than one hour is rejected.</li><li>A network fee more than 10× its 7-day median is flagged as an anomaly: the previous value is kept and shown as stale, and we are alerted.</li><li>If a source fails, the page keeps its last good value with a visible timestamp. The site never fails to build because of one source.</li><li>Every exchange network name is mapped to one internal id; unknown names are never published.</li></ul>
   <h2>{t(lang, 'method.limits')}</h2>

@@ -7,8 +7,9 @@ for (const f of ['networks.json', 'usdt-matrix.json', 'exchanges.json']) if (fs.
 const N = JSON.parse(fs.readFileSync('data/out/networks.json'));
 const usd = (v) => new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const LOGO = 'data:image/png;base64,' + fs.readFileSync('public/logo-192.png').toString('base64');
 const svg = (big, small, foot) => `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#0b0f17"/><rect x="0" y="0" width="14" height="630" fill="#2dd4bf"/>
-<text x="70" y="120" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#8b98a8" font-weight="600">Crypto Fee &amp; Transfer Index</text>
+<image href="${LOGO}" x="70" y="70" width="72" height="72"/><text x="162" y="120" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#8b98a8" font-weight="600">Crypto Fee &amp; Transfer Index</text>
 <text x="70" y="290" font-family="Helvetica, Arial, sans-serif" font-size="${big.length > 30 ? 60 : 76}" fill="#e6edf7" font-weight="800">${esc(big)}</text>
 <text x="70" y="380" font-family="Helvetica, Arial, sans-serif" font-size="40" fill="#2dd4bf" font-weight="700">${esc(small)}</text>
 <text x="70" y="560" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#8b98a8">${esc(foot)}</text></svg>`;

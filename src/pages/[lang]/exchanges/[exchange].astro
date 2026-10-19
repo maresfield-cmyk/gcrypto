@@ -9,7 +9,7 @@ const rows = [...e.rows].sort((a: any, b: any) => a.asset.localeCompare(b.asset)
 const noKey = e.note && /key/i.test(e.note);
 ---
 <Layout lang={lang} title={t(lang, 'ex.title', { exchange: e.name })} description={`${e.name}: USDT and BTC withdrawal fees per network, minimums, Gulf licensing and funding options.`} path={L(`/exchanges/${exchange}/`)} updated={E.generated_at} crumbs={[{ name: e.name, path: L(`/exchanges/${exchange}/`) }]}>
-  <h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.exchanges')} · {e.fee_source === 'api' ? 'API' : t(lang, 'ex.verified')}</p><h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1></div>
   {e.fee_source === 'manual' && <p class="note">{t(lang, 'ex.manual_note')} <a href={e.fee_page} rel="nofollow noopener">{t(lang, 'ex.fee_page')}</a></p>}
   {noKey && <p class="note">{t(lang, 'ex.no_key_note')}</p>}
   {e.stale && !noKey && <p class="note stale">{t(lang, 'stale', { time: e.observed_at })}: {e.stale_reason}</p>}
@@ -18,9 +18,9 @@ const noKey = e.note && /key/i.test(e.note);
     {!rows.length && <tr><td colspan="7" class="meta">{t(lang, 'hub.no_data')}</td></tr>}
   </tbody></table></div>
   <h2>{t(lang, 'ex.facts')}</h2>
-  <table><thead><tr><th>{t(lang, 'ex.region')}</th><th>{t(lang, 'ex.licence')}</th><th>{t(lang, 'ex.verified')}</th></tr></thead><tbody>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'ex.region')}</th><th>{t(lang, 'ex.licence')}</th><th>{t(lang, 'ex.verified')}</th></tr></thead><tbody>
     {e.facts.gulf_licensing.map((g: any) => <tr><td>{g.region}</td><td>{g.status}{g.source && <> · <a href={g.source} rel="nofollow noopener">{t(lang, 'source')}</a></>}</td><td class="meta">{g.verified && g.last_verified ? fmtDate(lang, g.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</td></tr>)}
-  </tbody></table>
+  </tbody></table></div>
   <dl class="kv" style="margin-top:12px"><dt>{t(lang, 'ex.currencies')}</dt><dd>{e.facts.deposit_currencies.length ? e.facts.deposit_currencies.join(', ') : '–'}</dd><dt>{t(lang, 'ex.p2p')}</dt><dd>{t(lang, e.facts.p2p ? 'ex.yes' : 'ex.no')}</dd><dt>{t(lang, 'ex.verified')}</dt><dd>{e.facts.last_verified ? fmtDate(lang, e.facts.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</dd></dl>
   <p class="meta"><a href={e.website} rel="nofollow noopener">{e.website}</a></p>
 </Layout>

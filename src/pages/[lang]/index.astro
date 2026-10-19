@@ -40,5 +40,5 @@ const L = (p: string) => `/${lang}${p}`;
   </tbody></table></div>
   <p class="meta"><a href={L('/compare/usdt-withdrawal-fees/')}>{t(lang, 'compare.h1')} →</a></p>
   {[100, 1000, 10000].map((amt) => { const c = combos(amt); return c.length ? <div><h2>{t(lang, 'hub.best_combo', { amount: t(lang, `amount.${amt}`) })}</h2><p class="lead">{t(lang, 'hub.combo_intro')}</p>
-    <table><tbody>{c.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{N.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} USDT</td><td class="num">{x.pct.toFixed(2)}%</td></tr>)}</tbody></table></div> : null; })}
+    <div class="tbl"><table><tbody>{c.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{N.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} USDT</td><td class="num">{x.pct.toFixed(2)}%</td></tr>)}</tbody></table></div></div> : null; })}
 </Layout>

@@ -14,11 +14,11 @@ for (const r of rows) { if (N.networks[r.network]?.token !== 'USDT') continue; (
 const winners = Object.entries(weeks).sort().reverse().map(([w, m]) => { const avg = Object.entries(m).map(([n, v]) => [n, v.reduce((a, b) => a + b, 0) / v.length] as [string, number]).sort((a, b) => a[1] - b[1]); return { week: w, network: avg[0][0], avg: avg[0][1] }; });
 ---
 <Layout lang={lang} title={t(lang, 'history.title')} description={t(lang, 'history.h1')} path={L('/history/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'history.title'), path: L('/history/') }]}>
-  <h1>{t(lang, 'history.h1')}</h1>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.history')}</p><h1>{t(lang, 'history.h1')}</h1></div>
   <h2>{t(lang, 'history.weekly')}</h2>
-  <table><thead><tr><th>{t(lang, 'history.week')}</th><th>{t(lang, 'history.winner')}</th><th class="num">{t(lang, 'history.avg')}</th></tr></thead><tbody>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'history.week')}</th><th>{t(lang, 'history.winner')}</th><th class="num">{t(lang, 'history.avg')}</th></tr></thead><tbody>
     {winners.map((w) => <tr><td>{fmtDate(lang, w.week)}</td><td><a href={L(`/networks/${w.network}/`)}>{N.networks[w.network].name}</a></td><td class="num">{fmtUsd(lang, w.avg)}</td></tr>)}
     {!winners.length && <tr><td colspan="3" class="meta">{t(lang, 'hub.no_data')}</td></tr>}
-  </tbody></table>
+  </tbody></table></div>
   {usdtNets.map((n) => { const r = rows.filter((x) => x.network === n.id); return <div><h2><a href={L(`/networks/${n.id}/`)}>{n.name}</a></h2>{r.length ? <Chart lang={lang} rows={r} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, N.generated_at) })}</p>}</div>; })}
 </Layout>

@@ -8,8 +8,8 @@ const L = (p: string) => `/${lang}${p}`;
 const exs = Object.entries(M.exchanges) as any[];
 ---
 <Layout lang={lang} title={t(lang, 'compare.title')} description={t(lang, 'compare.intro')} path={L('/compare/usdt-withdrawal-fees/')} updated={M.generated_at} crumbs={[{ name: t(lang, 'compare.title'), path: L('/compare/usdt-withdrawal-fees/') }]}>
-  <h1>{t(lang, 'compare.h1')}</h1>
-  <p class="lead">{t(lang, 'compare.intro')}</p>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.compare')}</p><h1>{t(lang, 'compare.h1')}</h1>
+  <p class="lead">{t(lang, 'compare.intro')}</p></div>
   <div class="scroll"><table id="cmp"><thead><tr><th class="sortable" data-col="0">{t(lang, 'compare.exchange')}</th>{M.networks.map((n: string, i: number) => <th class="num sortable" data-col={i + 1}><a href={L(`/networks/${n}/`)}>{N.networks[n]?.name ?? n}</a></th>)}</tr></thead><tbody>
     {exs.map(([id, e]) => { const best = Math.min(...M.networks.map((n: string) => e.cells[n]?.enabled && e.cells[n].fee != null && !e.cells[n].flags.length ? e.cells[n].fee : Infinity)); return <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a>{e.stale && <span class="pill warn"> {e.note && /key/.test(e.note) ? 'not connected' : 'stale'}</span>}</td>{M.networks.map((n: string) => { const c = e.cells[n]; return <td class={'num' + (c && c.fee === best && c.enabled ? ' best' : '')} data-v={c && c.fee != null ? c.fee : ''}>{!c ? '–' : c.fee == null ? '?' : <>{fmtNum(lang, c.fee)}{!c.enabled && <span class="pill bad"> {t(lang, 'ex.closed')}</span>}</>}</td>; })}</tr>; })}
   </tbody></table></div>
