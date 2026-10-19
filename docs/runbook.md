@@ -1,6 +1,6 @@
 # Runbook: Crypto Fee & Transfer Index
 
-Site: https://crypto.gulfarcade.com · Repo: `gcrypto` · Everything runs from GitHub Actions (`.github/workflows/update.yml`); every step also runs locally on a Mac.
+Site: https://crypto.gulfarcade.com · Repo: `gcrypto` · Everything runs from GitHub Actions (`.github/workflows/update.yml`) and is hosted on GitHub Pages; every step also runs locally on a Mac.
 
 ## Local commands
 ```
@@ -45,4 +45,4 @@ Create the new read-only key (no trade/withdraw permission), update the GitHub s
 `api.binance.com` returns HTTP 451 to US addresses. If the Binance step fails in Actions: (a) run the job on a self-hosted runner outside the US (a Mac that is always on works), or (b) set `fee_source: manual` for Binance in `exchanges.yml` and keep its rows in the manual sheet.
 
 ## Rebuild policy
-The site is rebuilt and deployed only when a network fee moved more than 5% or an alert fired (`data/out/run.json` → `rebuild`), or on the 6-hourly exchange run. Between rebuilds the pages refresh their numbers from `/data/networks.json` in the browser.
+The site is rebuilt and published only when a network fee moved more than 5% or an alert fired (`data/out/run.json` → `rebuild`), or on the 6-hourly exchange run. Between rebuilds the pages refresh their numbers from `/data/networks.json` in the browser.

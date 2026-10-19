@@ -4,6 +4,6 @@ Standalone data site for **crypto.gulfarcade.com**: what a USDT or BTC transfer 
 
 - Data scripts (no dependencies beyond `yaml`, `sharp`, `nodemailer`): `scripts/` and `src/fetch/`, output in `data/out/`.
 - Site: Astro, static, built from `data/out/*.json`; strings in `locales/en.json` (Arabic to follow in `locales/ar.json`).
-- Scheduler: `.github/workflows/update.yml` (every 15 min / 6 h), deploys to Netlify when values move.
+- Scheduler: `.github/workflows/update.yml` (every 15 min / 6 h), publishes to GitHub Pages when values move.
 
 Quick start: `cp .env.example .env`, `npm ci`, `node scripts/run.mjs all`, `npx astro preview`.

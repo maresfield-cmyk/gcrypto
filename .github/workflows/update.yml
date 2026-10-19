@@ -1,5 +1,6 @@
 # Scheduled data runs. Every 15 min: network fees + prices; every 6 h: exchange fees too (plus history rollup); manual trigger.
-# Writes data/history + data/out back to the repo, then deploys to Netlify only when a value moved meaningfully.
+# Writes data/history + data/out back to the repo, then publishes the built site to GitHub Pages only when a value moved meaningfully.
+# Setup once: repo Settings -> Pages -> Source "GitHub Actions"; custom domain crypto.gulfarcade.com (public/CNAME) with a DNS CNAME to <user>.github.io.
 # NOTE: GitHub-hosted runners are in the US and api.binance.com refuses US addresses (HTTP 451). If Binance fails here,
 # docs/runbook.md lists the options (self-hosted runner, or Binance via the manual sheet).
 name: update
@@ -11,7 +12,7 @@ on:
     inputs:
       mode: { description: 'networks | all', default: 'all' }
 concurrency: { group: update, cancel-in-progress: false }
-permissions: { contents: write }
+permissions: { contents: write, pages: write, id-token: write }
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -48,10 +49,13 @@ jobs:
           git config user.name "gcrypto-bot" && git config user.email "bot@users.noreply.github.com"
           git add data/history data/out data/raw/*/latest.json 2>/dev/null || true
           git diff --cached --quiet || git commit -m "data: $(date -u +%FT%TZ) [skip ci]" && git push
-      - name: Deploy to Netlify (only when values moved)
+      - name: Upload site (only when values moved)
         if: ${{ hashFiles('dist/index.html') != '' }}
-        env: { NETLIFY_AUTH_TOKEN: '${{ secrets.NETLIFY_AUTH_TOKEN }}', NETLIFY_SITE_ID: '${{ secrets.NETLIFY_SITE_ID }}' }
-        run: npx --yes netlify-cli@17 deploy --prod --dir dist --message "data $(date -u +%FT%TZ)"
+        uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+      - name: Publish to GitHub Pages
+        if: ${{ hashFiles('dist/index.html') != '' }}
+        uses: actions/deploy-pages@v4
       - name: Keep raw responses for 90 days
         uses: actions/upload-artifact@v4
         with: { name: 'raw-${{ github.run_id }}', path: data/raw, retention-days: 90, if-no-files-found: ignore }

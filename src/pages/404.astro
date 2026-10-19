@@ -1,0 +1,8 @@
+---
+import Layout from '../components/Layout.astro';
+import { t } from '../data';
+const lang = 'en';
+---
+<Layout lang={lang} title="404" description="Page not found" path="/404/">
+  <div class="hero"><h1>404</h1><p class="lead">That page does not exist. <a href={`/${lang}/`}>{t(lang, 'nav.home')}</a></p></div>
+</Layout>
