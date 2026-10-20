@@ -90,6 +90,11 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .two { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
   .note { border: 1px solid var(--box); border-inline-start: 4px solid var(--accent); background: var(--card); padding: 12px 14px; border-radius: 12px; box-shadow: var(--shadow); }
   .note p { color: var(--fg-2); }
+  .codebox { position: relative; }
+  .codebox textarea.code { padding-inline-end: 96px; }
+  .copy { position: absolute; inset-inline-end: 10px; top: 10px; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border-radius: 9px; border: 1px solid var(--box); background: var(--card); color: var(--fg-2); font: 600 12.5px/1 inherit; font-family: inherit; cursor: pointer; }
+  .copy:hover { border-color: var(--accent); color: var(--fg); } .copy[data-done="1"] { border-color: var(--accent); color: var(--accent); }
+  .copy svg { width: 14px; height: 14px; }
   code, pre, textarea.code { font-family: var(--mono); font-size: 13px; }
   pre, textarea.code { background: var(--card); border: 1px solid var(--box); border-radius: 12px; padding: 14px; overflow: auto; width: 100%; direction: ltr; text-align: left; color: var(--fg-2); }
   button, select, input { font: inherit; }
@@ -102,13 +107,12 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   details.fold > summary { cursor: pointer; margin: 28px 0 10px; list-style: none; } details.fold > summary::before { content: "▸ "; color: var(--muted); } details.fold[open] > summary::before { content: "▾ "; } details.fold > summary::-webkit-details-marker { display: none; }
   .spark { width: 120px; height: 32px; display: block; margin-top: 8px; color: var(--accent); }
   dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; font-size: 14.5px; } dl.kv dt { color: var(--muted); min-width: 0; } dl.kv dd { margin: 0; text-align: end; white-space: nowrap; }
-  /* Phones: two cards per row, tighter spacing, a single scrolling line of navigation */
+  /* Phones: two cards per row, tighter spacing, the six navigation links as a 3-column grid (no scrolling) */
   @media (max-width: 640px) {
     header.top .wrap { min-height: 56px; padding-block: 8px; gap: 6px 12px; }
     .brand { font-size: 15px; }
-    nav.main { flex-wrap: nowrap; overflow-x: auto; width: 100%; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    nav.main::-webkit-scrollbar { display: none; }
-    nav.main a { padding: 6px 10px; font-size: 13.5px; white-space: nowrap; }
+    nav.main { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: 100%; }
+    nav.main a { padding: 7px 4px; font-size: 13px; white-space: nowrap; text-align: center; border: 1px solid var(--box); background: var(--card); overflow: hidden; text-overflow: ellipsis; }
     main { padding-block: 18px 40px; }
     .hero { padding-bottom: 14px; }
     h1 { font-size: 27px; }
