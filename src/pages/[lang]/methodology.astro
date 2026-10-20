@@ -1,6 +1,6 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { LANGS, t, fees, exchanges, assetList, defaultAsset, SITE_URL, fmtDate } from '../../data';
+import { LANGS, t, fees, exchanges, assetList, defaultAsset, netConfig, SITE_URL, fmtDate } from '../../data';
 export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
 const { lang } = Astro.params;
 const F = fees(), E = exchanges(), N = { generated_at: F.generated_at };
@@ -8,29 +8,31 @@ const assets = assetList();
 const L = (p: string) => `/${lang}${p}`;
 const dataset = { '@context': 'https://schema.org', '@type': 'Dataset', name: t(lang, 'site.name'), description: t(lang, 'site.tagline'), url: `${SITE_URL}${L('/methodology/')}`, license: 'https://creativecommons.org/licenses/by/4.0/', creator: { '@type': 'Organization', name: t(lang, 'site.name') }, temporalCoverage: `${N.generated_at.slice(0, 10)}/..`, distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/fees.json` }, { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/data/matrix.json` }] };
 const nets = Object.values(defaultAsset().networks).concat(Object.values(F.assets.btc.networks)) as any[];
+const cfg = Object.fromEntries(netConfig().map((n: any) => [n.id, n]));
+const ext = { rel: 'nofollow noopener', target: '_blank' };
 ---
 <Layout lang={lang} title={t(lang, 'method.title')} description={t(lang, 'method.h1')} path={L('/methodology/')} updated={N.generated_at} crumbs={[{ name: t(lang, 'method.title'), path: L('/methodology/') }]} jsonld={[dataset]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.methodology')}</p><h1>{t(lang, 'method.h1')}</h1>
   <p class="lead">{t(lang, 'method.cadence')}</p></div>
   <h2>{t(lang, 'method.assets')}</h2>
   <p>{t(lang, 'method.assets_text', { list: assets.map((a) => a.name).join(', ') })}</p>
-  <h2>Network fees</h2>
-  <div class="tbl"><table><thead><tr><th>Network</th><th>How the number is produced</th><th>Source</th></tr></thead><tbody>
-    {nets.map((n) => <tr><td><a href={L(`/networks/${n.network}/`)}>{n.name}</a></td><td>{n.breakdown.note || Object.keys(n.breakdown).filter((k) => k !== 'note').map((k) => k.replace(/_/g, ' ')).join(', ')}</td><td class="meta">{n.source}</td></tr>)}
+  <h2>{t(lang, 'method.networks_h2')}</h2>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'method.col_network')}</th><th>{t(lang, 'method.col_how')}</th><th>{t(lang, 'method.col_source')}</th></tr></thead><tbody>
+    {nets.map((n) => <tr><td><a href={L(`/networks/${n.network}/`)}>{n.name}</a></td><td>{t(lang, `method.how.${n.network}`)}</td><td><a href={cfg[n.network].data_source.url} {...ext}>{cfg[n.network].data_source.name}</a></td></tr>)}
   </tbody></table></div>
-  <p>Fee in USD = fee in the native coin × the coin's USD price (CoinGecko, cached 5 minutes; Binance and OKX tickers as fallbacks). Time to credit = the confirmations major exchanges require × block time, from <code>config/networks.json</code> with a source per row.</p>
-  <h2>Exchange withdrawal fees</h2>
-  <div class="tbl"><table><thead><tr><th>Exchange</th><th>Method</th><th>Source</th></tr></thead><tbody>
-    {Object.entries(E.exchanges).map(([id, e]: any) => <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a></td><td>{e.fee_source === 'api' ? 'Exchange API, every 6 hours' : 'Checked by hand against the fee page, dated per row'}</td><td class="meta"><a href={e.fee_page} rel="nofollow noopener">{e.fee_page}</a></td></tr>)}
+  <p>{t(lang, 'method.usd_text')}</p>
+  <h2>{t(lang, 'method.exchanges_h2')}</h2>
+  <div class="tbl"><table><thead><tr><th>{t(lang, 'method.col_exchange')}</th><th>{t(lang, 'method.col_method')}</th><th>{t(lang, 'method.col_source')}</th></tr></thead><tbody>
+    {Object.entries(E.exchanges).map(([id, e]: any) => <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a></td><td>{t(lang, e.fee_source === 'api' ? 'method.api_method' : 'method.manual_method')}</td><td><a href={e.fee_page} {...ext}>{e.name} {t(lang, 'method.fee_page')}</a></td></tr>)}
   </tbody></table></div>
-  <h2>Validation</h2>
-  <ul><li>No negative fees; each network has a sanity cap; a price older than one hour is rejected.</li><li>A network fee more than 10× its 7-day median is flagged as an anomaly: the previous value is kept and shown as stale, and we are alerted.</li><li>If a source fails, the page keeps its last good value with a visible timestamp. The site never fails to build because of one source.</li><li>Every exchange network name is mapped to one internal id; unknown names are never published.</li></ul>
+  <h2>{t(lang, 'method.validation_h2')}</h2>
+  <ul>{[1, 2, 3, 4].map((i) => <li>{t(lang, `method.validation_${i}`)}</li>)}</ul>
   <h2>{t(lang, 'method.limits')}</h2>
-  <ul><li>Network fees are for one standard USDT transfer (or one BTC transaction) at the moment shown; your wallet may choose a different priority.</li><li>Exchange fees can change without notice; API values are at most 6 hours old, manual values show their check date.</li><li>Hand-maintained facts (licensing, deposit currencies) show "unverified" until checked against the regulator's register.</li><li>No affiliate links; nothing here is a recommendation.</li></ul>
+  <ul>{[1, 2, 3, 4].map((i) => <li>{t(lang, `method.limits_${i}`)}</li>)}</ul>
   <h2>{t(lang, 'method.saudi')}</h2>
   <p>{t(lang, 'method.saudi_text')}</p>
   <h2>{t(lang, 'method.cite')}</h2>
   <pre>{t(lang, 'method.cite_text', { date: fmtDate(lang, N.generated_at) })}</pre>
-  <p>Raw data: <a href="/data/fees.json">fees.json</a> · <a href="/data/matrix.json">matrix.json</a> · <a href="/data/exchanges.json">exchanges.json</a></p>
+  <p>{t(lang, 'method.raw')}: <a href="/data/fees.json">fees.json</a> · <a href="/data/matrix.json">matrix.json</a> · <a href="/data/exchanges.json">exchanges.json</a></p>
   <p><a href={L('/embed/')}>{t(lang, 'embed.h1')} →</a></p>
 </Layout>

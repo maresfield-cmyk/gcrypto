@@ -1,5 +1,5 @@
 {
-  "_doc": "One entry per network (the chains). What is priced on each chain is in config/assets.json. 'confirmations' = what major exchanges require before crediting a deposit (count, source, last_verified); block_time_s and these give the time estimate. sanity_cap_usd = a fee above this is rejected as bad data.",
+  "_doc": "One entry per network (the chains). What is priced on each chain is in config/assets.json. 'confirmations' = what major exchanges require before crediting a deposit (count, source, last_verified); block_time_s and these give the time estimate. sanity_cap_usd = a fee above this is rejected as bad data. 'data_source' = the public service the live fee is read from, shown by name with a link on the methodology page.",
   "networks": [
     {
       "id": "tron",
@@ -14,7 +14,11 @@
         "source": "https://www.kucoin.com (API: confirms for TRC20 = 3; Binance lists 19 for TRX network deposits)",
         "last_verified": "2026-10-19"
       },
-      "gas_fallback": null
+      "gas_fallback": null,
+      "data_source": {
+        "name": "TronGrid",
+        "url": "https://www.trongrid.io/"
+      }
     },
     {
       "id": "ethereum",
@@ -30,6 +34,10 @@
         "count": 12,
         "source": "Binance deposit page lists 6-12 for ETH network; KuCoin API: 64",
         "last_verified": "2026-10-19"
+      },
+      "data_source": {
+        "name": "PublicNode",
+        "url": "https://ethereum.publicnode.com/"
       }
     },
     {
@@ -44,10 +52,14 @@
       "compute_units": 200000,
       "confirmations": {
         "count": 32,
-        "source": "finalized \u2248 32 slots; Bitget API: 5",
+        "source": "finalized ≈ 32 slots; Bitget API: 5",
         "last_verified": "2026-10-19"
       },
-      "gas_fallback": null
+      "gas_fallback": null,
+      "data_source": {
+        "name": "Solana public RPC",
+        "url": "https://solana.com/docs/rpc"
+      }
     },
     {
       "id": "bsc",
@@ -63,6 +75,10 @@
         "count": 15,
         "source": "Bitget API: deposit 15; KuCoin: 60",
         "last_verified": "2026-10-19"
+      },
+      "data_source": {
+        "name": "PublicNode",
+        "url": "https://bsc.publicnode.com/"
       }
     },
     {
@@ -79,6 +95,10 @@
         "count": 60,
         "source": "Bitget API: deposit 60; KuCoin: 300",
         "last_verified": "2026-10-19"
+      },
+      "data_source": {
+        "name": "PublicNode",
+        "url": "https://polygon.publicnode.com/"
       }
     },
     {
@@ -95,6 +115,10 @@
         "count": 12,
         "source": "Bitget API: deposit 12",
         "last_verified": "2026-10-19"
+      },
+      "data_source": {
+        "name": "Arbitrum public RPC",
+        "url": "https://docs.arbitrum.io/build-decentralized-apps/reference/node-providers"
       }
     },
     {
@@ -111,7 +135,11 @@
         "source": "Bitget API: deposit 10 (blocks); KuCoin: 1",
         "last_verified": "2026-10-19"
       },
-      "gas_fallback": null
+      "gas_fallback": null,
+      "data_source": {
+        "name": "tonapi.io",
+        "url": "https://tonapi.io/"
+      }
     },
     {
       "id": "bitcoin",
@@ -127,7 +155,11 @@
         "source": "Binance credits BTC after 1 confirmation, unlocks at 2 (deposit page)",
         "last_verified": "2026-10-19"
       },
-      "gas_fallback": null
+      "gas_fallback": null,
+      "data_source": {
+        "name": "mempool.space",
+        "url": "https://mempool.space/"
+      }
     }
   ],
   "price_max_age_s": 3600,
