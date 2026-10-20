@@ -44,7 +44,7 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
   </tbody></table></div>
   <p class="meta"><a href={L(`/compare/${asset}-withdrawal-fees/`)}>{t(lang, 'compare.h1', { asset: A.symbol })} →</a></p>
   {combos.length > 0 && <div><h2>{t(lang, 'hub.best_combo', { asset: A.symbol })}</h2><p class="lead">{t(lang, 'hub.combo_intro')}</p>
-    <div class="scroll"><table><thead><tr><th>#</th><th>{t(lang, 'compare.exchange')} · {t(lang, 'hub.network')}</th><th class="num">{t(lang, 'hub.fee')}</th><th class="num">≈ USD</th>{AMTS.map((a) => <th class="num">{t(lang, `amount.${a}`)}</th>)}</tr></thead><tbody>
-      {combos.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a> · <a href={L(`/networks/${x.n}/`)}>{F.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} {A.symbol}</td><td class="num">{fmtUsd(lang, x.fee_usd)}</td>{AMTS.map((a) => <td class="num">{x.min_usd != null && x.min_usd > a ? <span class="meta">{t(lang, 'hub.combo_min', { min: `${fmtNum(lang, x.min)} ${A.symbol}` })}</span> : fmtPct(lang, x.fee_usd, a)}</td>)}</tr>)}
+    <div class="scroll"><table><thead><tr><th>#</th><th>{t(lang, 'compare.exchange')}</th><th>{t(lang, 'hub.network')}</th><th class="num">{t(lang, 'hub.fee')}</th><th class="num">≈ USD</th>{AMTS.map((a) => <th class="num">{t(lang, `amount.${a}`)}</th>)}</tr></thead><tbody>
+      {combos.map((x, i) => <tr><td>{i + 1}</td><td><a href={L(`/exchanges/${x.exId}/`)}>{x.ex}</a></td><td><a href={L(`/networks/${x.n}/`)}>{F.networks[x.n]?.name ?? x.n}</a></td><td class="num">{fmtNum(lang, x.fee)} {A.symbol}</td><td class="num">{fmtUsd(lang, x.fee_usd)}</td>{AMTS.map((a) => <td class="num">{x.min_usd != null && x.min_usd > a ? <span class="meta">{t(lang, 'hub.combo_min', { min: `${fmtNum(lang, x.min)} ${A.symbol}` })}</span> : fmtPct(lang, x.fee_usd, a)}</td>)}</tr>)}
     </tbody></table></div></div>}
 </Layout>
