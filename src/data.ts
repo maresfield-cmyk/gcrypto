@@ -8,7 +8,7 @@ export const dir = (lang: string) => (lang === 'ar' ? 'rtl' : 'ltr');
 export const NUM = 'en';
 export const dateLocale = (lang: string) => (lang === 'ar' ? 'ar-AE-u-nu-latn' : lang);
 // In right-to-left text a number like $0.0005 or 20/10/2026 would be re-ordered by the bidi algorithm; isolating it keeps it as written.
-export const iso = (lang: string, s: string) => (lang === 'ar' ? `\u2066${s}\u2069` : s);
+export const iso = (lang: string, s: string) => (lang === 'ar' ? `\u2066${s.replace(/\u200f/g, '')}\u2069` : s);   // also drops the RTL marks Arabic date formats insert
 export const LANG_NAMES: Record<string, string> = { en: 'English', ar: 'العربية' };
 const J = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 export const fees = () => J('data/out/fees.json');
