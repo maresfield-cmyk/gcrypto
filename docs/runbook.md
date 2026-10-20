@@ -8,7 +8,7 @@ cp .env.example .env            # fill in the keys (read-only!)
 npm ci
 node scripts/fetch-networks.mjs # Layer 1: 8 networks + prices -> data/out/networks.json (~15 s)
 node scripts/fetch-exchanges.mjs# Layer 2: exchange fees -> data/out/exchanges.json, usdt-matrix.json, unmapped.json
-node scripts/alert.mjs          # evaluate alerts (emails only with SMTP settings)
+node scripts/alert.mjs          # evaluate alerts (emails only with SMTP settings); add --test to send a test email
 node scripts/run.mjs all        # all of the above + rollup + publish + site build when values moved
 node scripts/publish-data.mjs && npx astro build && npx astro preview   # look at the site locally
 node scripts/discover.mjs       # re-verify every data source (docs/discovery-report.md)

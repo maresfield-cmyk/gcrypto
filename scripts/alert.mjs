@@ -10,6 +10,7 @@ const STATE = 'data/out/alert-state.json', now = Date.now();
 const state = fs.existsSync(STATE) ? JSON.parse(fs.readFileSync(STATE)) : { failing: {}, sent: {} };
 const alerts = [...(fs.existsSync('data/out/alerts.json') ? JSON.parse(fs.readFileSync('data/out/alerts.json')) : []), ...(fs.existsSync('data/out/alerts-exchanges.json') ? JSON.parse(fs.readFileSync('data/out/alerts-exchanges.json')) : [])];
 const due = [];
+if (process.argv.includes('--test')) due.push({ key: 'test', subject: 'Test alert', body: `Sent by node scripts/alert.mjs --test at ${new Date().toISOString()}. If you can read this, alert email works.` }); // node scripts/alert.mjs --test
 const failingNow = new Set();
 for (const a of alerts) {
   const key = `${a.type}:${a.network || a.exchange || 'global'}`;
