@@ -4,6 +4,8 @@ import '@fontsource-variable/inter';
 import { t, dir, SITE_URL, fmtTime } from '../data';
 interface Props { lang: string; title: string; description: string; path: string; og?: string; updated?: string; crumbs?: { name: string; path: string }[]; jsonld?: object[] }
 const { lang, title, description, path, og, updated, crumbs = [], jsonld = [] } = Astro.props;
+// Search engines cut titles at about 60 characters: keep the site name only when the whole thing fits.
+const fullTitle = `${title} | ${t(lang, 'site.name')}`.length <= 60 ? `${title} | ${t(lang, 'site.name')}` : title;
 const L = (p: string) => `/${lang}${p}`;
 const NAV = [['/', 'nav.home'], ['/calculator/', 'nav.calculator'], ['/compare/usdt-withdrawal-fees/', 'nav.compare'], ['/history/', 'nav.history'], ['/methodology/', 'nav.methodology'], ['/embed/', 'nav.embed']];
 const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: t(lang, 'breadcrumb.home'), item: `${SITE_URL}${L('/')}` }, ...crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 2, name: c.name, item: `${SITE_URL}${c.path}` }))] };
@@ -13,12 +15,13 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} | {t(lang, 'site.name')}</title>
+<title>{fullTitle}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={`${SITE_URL}${path}`}>
-<link rel="alternate" hreflang="en" href={`${SITE_URL}/en${path.replace(/^\/[a-z]{2}/, '')}`}>
+<link rel="alternate" hreflang="en" href={`${SITE_URL}/en${path.replace(/^\/[a-z]{2}/, '')}`}><link rel="alternate" hreflang="x-default" href={`${SITE_URL}/en${path.replace(/^\/[a-z]{2}/, '')}`}>
 <meta property="og:title" content={title}><meta property="og:description" content={description}><meta property="og:type" content="website"><meta property="og:url" content={`${SITE_URL}${path}`}>
-{og && <meta property="og:image" content={`${SITE_URL}${og}`} />}{og && <meta name="twitter:card" content="summary_large_image" />}
+<meta property="og:site_name" content={t(lang, 'site.name')}><meta property="og:locale" content={lang === 'ar' ? 'ar_AE' : 'en_GB'}><meta property="og:image" content={`${SITE_URL}${og || '/og/default.png'}`}><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content={title}>
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content={fullTitle}><meta name="twitter:description" content={description}><meta name="twitter:image" content={`${SITE_URL}${og || '/og/default.png'}`}>
 <meta name="color-scheme" content="light dark"><link rel="icon" href="/favicon.png" type="image/png" sizes="64x64"><link rel="apple-touch-icon" href="/logo-180.png">
 <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />
 {jsonld.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j)} />)}

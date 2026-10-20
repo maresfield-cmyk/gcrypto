@@ -18,6 +18,7 @@ const cheapest = (a) => Object.values(a.networks).filter((n) => n.fee_usd != nul
 const T = JSON.parse(fs.readFileSync('locales/en.json', 'utf8')); // share-image wording (English for now; Arabic images come with the /ar/ phase)
 const tt = (k, v) => T[k].replace(/\{(\w+)\}/g, (_, n) => v[n]);
 const jobs = [];
+jobs.push(['default', svg(T['site.name'], T['site.tagline'], `crypto.gulfarcade.com · ${when}`)]);
 for (const a of Object.values(F.assets)) { const b = cheapest(a); jobs.push([a.id, svg(tt('og.cost', { asset: a.symbol }), b ? tt('og.cheapest', { network: b.name, fee: usd(b.fee_usd) }) : '', `crypto.gulfarcade.com · ${when}`)]); }
 const D = Object.values(F.assets).find((a) => a.default);
 for (const n of Object.values(D.networks)) if (n.fee_usd != null) jobs.push(['net-' + n.network, svg(tt('og.net', { network: n.name, asset: D.symbol, fee: usd(n.fee_usd) }), `${new Intl.NumberFormat('en', { maximumSignificantDigits: 4 }).format(n.fee_native)} ${n.native} · ~${n.eta_min} min to credit`, `crypto.gulfarcade.com · ${when}`)]);
