@@ -13,7 +13,7 @@ const data = {
 };
 const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt', 'calc.alt_wallet', 'calc.min', 'calc.below_min', 'calc.not_offered', 'minutes', 'calc.own_wallet'].map((k) => [k, t(lang, k)]));
 ---
-<Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.intro')} path={L('/calculator/')} updated={F.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
+<Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.description')} path={L('/calculator/')} updated={F.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.calculator')}</p><h1>{t(lang, 'calc.title')}</h1><p class="lead">{t(lang, 'calc.intro')}</p></div>
   <form id="calc" class="card" style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end">
     <label>{t(lang, 'calc.amount')} (USD)<br><input id="amount" type="number" min="1" value="100" style="width:100%"></label>
