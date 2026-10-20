@@ -8,7 +8,7 @@ const L = (p: string) => `/${lang}${p}`;
 const code = (src: string, h: number) => `<iframe src="${SITE_URL}${src}" title="${t(lang, 'site.name')}" width="100%" height="${h}" style="max-width:420px;border:0;border-radius:12px" loading="lazy"></iframe>`;
 const usdtNets = Object.values(D.networks).map((c: any) => ({ id: c.network, name: c.name })) as any[];
 ---
-<Layout lang={lang} title={t(lang, 'embed.title')} description={t(lang, 'embed.intro')} path={L('/embed/')} crumbs={[{ name: t(lang, 'embed.title'), path: L('/embed/') }]}>
+<Layout lang={lang} title={t(lang, 'embed.title')} description={t(lang, 'embed.description')} path={L('/embed/')} crumbs={[{ name: t(lang, 'embed.title'), path: L('/embed/') }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.embed')}</p><h1>{t(lang, 'embed.h1')}</h1>
   <p class="lead">{t(lang, 'embed.intro')}</p></div>
   <h2>{t(lang, 'embed.cheapest')}</h2>
