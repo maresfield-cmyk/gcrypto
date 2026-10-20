@@ -158,6 +158,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   @media (max-width: 640px) {
     header.top .wrap { min-height: 56px; padding-block: 8px; gap: 6px 12px; }
     .lmenu > summary { min-height: 34px; padding: 0 8px; } .lmenu > summary span { display: none; }   /* phones: globe + arrow only, stays on the logo row */
+    .lmenu ul { inset-inline-start: auto; inset-inline-end: 0; }   /* phones: the list hangs from the button's inner edge, away from the screen edge */
     .brand { font-size: 15px; }
     nav.main { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: 100%; }
     nav.main a { padding: 7px 4px; font-size: 13px; white-space: nowrap; text-align: center; border: 1px solid var(--box); background: var(--card); overflow: hidden; text-overflow: ellipsis; }
@@ -229,7 +230,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   document.addEventListener('click', function (e) { document.querySelectorAll('details.apick[open], details.lmenu[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); }); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.querySelectorAll('details.apick[open], details.lmenu[open]').forEach(function (d) { d.removeAttribute('open'); }); });
   // Keep the open list inside the screen: if it would run past the right edge (phones), shift it left by the overflow.
-  document.querySelectorAll('details.apick').forEach(function (d) { d.addEventListener('toggle', function () {
+  document.querySelectorAll('details.apick, details.lmenu').forEach(function (d) { d.addEventListener('toggle', function () {
     var ul = d.querySelector('ul'); if (!ul) return; ul.style.insetInlineStart = '';
     if (!d.open) return;
     // visualViewport = the part of the page on screen, which matters when the phone is pinch-zoomed in.
