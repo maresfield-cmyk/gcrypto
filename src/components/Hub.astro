@@ -22,7 +22,7 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
     <p class="lead">{t(lang, 'hub.intro', { asset: A.symbol })}</p>
     {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
   </div>
-  <div class="grid">
+  <div class="grid" style={sorted.length >= 3 && sorted.length <= 8 ? `--n:${sorted.length}` : undefined}>
     {sorted.map((n, i) => <a class={'card' + (i === 0 ? ' rank-1' : '')} href={L(`/networks/${n.network}/`)} style="text-decoration:none;color:inherit">
       <div class="name">{n.name}</div>
       <div class="fee" data-live-fee={`${asset}:${n.network}`}>{fmtUsd(lang, n.fee_usd)}</div>

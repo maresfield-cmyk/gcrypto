@@ -34,7 +34,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif; font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
   a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
   a:hover { color: var(--accent-2); }
-  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 32px); }
+  .wrap { max-width: 1200px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 32px); }
   header.top { position: sticky; top: 0; z-index: 20; backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); background: color-mix(in srgb, var(--bg) 78%, transparent); border-block-end: 1px solid var(--line); }
   header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; min-height: 64px; padding-block: 10px; }
   .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; color: var(--fg); margin-inline-end: auto; font-size: 17px; }
@@ -56,6 +56,15 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .hero { position: relative; padding: 4px 0 16px; }
   .hero::before { content: ""; position: absolute; inset: -40px -10vw auto; height: 320px; background: radial-gradient(60% 80% at 20% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%), radial-gradient(40% 60% at 90% 10%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 70%); pointer-events: none; z-index: -1; }
   .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  /* A grid that knows its card count (style="--n:7") lays all cards in one equal row on desktop, so there is no empty cell
+     at the end; the fee shrinks a little when seven share the row. */
+  @media (min-width: 1000px) {
+    .grid[style*="--n"] { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+    .grid[style*="--n:7"] .fee, .grid[style*="--n:6"] .fee { font-size: 23px; }
+    .grid[style*="--n:7"] .card, .grid[style*="--n:6"] .card { padding: 12px 13px; }
+    .grid[style*="--n:7"] .name, .grid[style*="--n:6"] .name { font-size: 13px; }
+    .grid[style*="--n:7"] .sub, .grid[style*="--n:6"] .sub { font-size: 12px; }
+  }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
   a.card:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 2px 4px rgba(15,23,42,.05), 0 16px 32px -12px rgba(15,23,42,.18); }
   .card .name { font-weight: 600; color: var(--fg-2); font-size: 14px; letter-spacing: 0.01em; }

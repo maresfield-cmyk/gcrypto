@@ -15,7 +15,7 @@ const skip = new Set(['note', 'estimation_wallet']);
 ---
 <Layout lang={lang} title={t(lang, 'net.title', { network: N.name })} description={`${N.name}: ${fmtUsd(lang, n.fee_usd)} per ${main.symbol} transfer right now, every asset on this chain, how the fee is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/net-${network}.png`} updated={F.generated_at} crumbs={[{ name: N.name, path: L(`/networks/${network}/`) }]}>
   <div class="hero"><p class="eyebrow">{main.symbol} · {N.name}</p><h1>{t(lang, 'net.h1', { network: N.name })}</h1></div>
-  <div class="grid">
+  <div class="grid" style="--n:3">
     <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={`${main.id}:${network}`}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
     <div class="card"><div class="sub">{t(lang, 'net.native_fee', { native: N.native })}</div><div class="fee num">{fmtNum(lang, n.fee_native)}</div><div class="sub">1 {N.native} = {fmtUsd(lang, n.price_usd, 2)}</div></div>
     <div class="card"><div class="sub">{t(lang, 'net.time')}</div><div class="fee">{t(lang, 'minutes', { n: n.eta_min })}</div><div class="sub">{t(lang, 'net.time_detail', { blocks: N.confirmations.count, block_time: cfg.block_time_s })}</div></div>
