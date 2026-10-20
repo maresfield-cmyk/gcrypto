@@ -15,9 +15,11 @@ const svg = (big, small, foot) => `<svg xmlns="http://www.w3.org/2000/svg" width
 <text x="70" y="560" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#8b98a8">${esc(foot)}</text></svg>`;
 const when = F.generated_at.slice(0, 16).replace('T', ' ') + ' UTC';
 const cheapest = (a) => Object.values(a.networks).filter((n) => n.fee_usd != null).sort((x, y) => x.fee_usd - y.fee_usd)[0];
+const T = JSON.parse(fs.readFileSync('locales/en.json', 'utf8')); // share-image wording (English for now; Arabic images come with the /ar/ phase)
+const tt = (k, v) => T[k].replace(/\{(\w+)\}/g, (_, n) => v[n]);
 const jobs = [];
-for (const a of Object.values(F.assets)) { const b = cheapest(a); jobs.push([a.id, svg(`Cost to send ${a.symbol} right now`, b ? `Cheapest: ${b.name} at ${usd(b.fee_usd)}` : '', `crypto.gulfarcade.com · ${when}`)]); }
+for (const a of Object.values(F.assets)) { const b = cheapest(a); jobs.push([a.id, svg(tt('og.cost', { asset: a.symbol }), b ? tt('og.cheapest', { network: b.name, fee: usd(b.fee_usd) }) : '', `crypto.gulfarcade.com · ${when}`)]); }
 const D = Object.values(F.assets).find((a) => a.default);
-for (const n of Object.values(D.networks)) if (n.fee_usd != null) jobs.push(['net-' + n.network, svg(`${n.name} ${D.symbol} fee right now: ${usd(n.fee_usd)}`, `${new Intl.NumberFormat('en', { maximumSignificantDigits: 4 }).format(n.fee_native)} ${n.native} · ~${n.eta_min} min to credit`, `crypto.gulfarcade.com · ${when}`)]);
+for (const n of Object.values(D.networks)) if (n.fee_usd != null) jobs.push(['net-' + n.network, svg(tt('og.net', { network: n.name, asset: D.symbol, fee: usd(n.fee_usd) }), `${new Intl.NumberFormat('en', { maximumSignificantDigits: 4 }).format(n.fee_native)} ${n.native} · ~${n.eta_min} min to credit`, `crypto.gulfarcade.com · ${when}`)]);
 for (const [name, s] of jobs) await sharp(Buffer.from(s)).png({ compressionLevel: 9 }).toFile(`public/og/${name}.png`);
 console.log(`published ${jobs.length} OG images + data json`);

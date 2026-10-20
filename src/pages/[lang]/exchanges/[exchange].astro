@@ -8,7 +8,7 @@ const L = (p: string) => `/${lang}${p}`;
 const rows = [...e.rows].sort((a: any, b: any) => a.asset.localeCompare(b.asset) || (a.fee ?? 1e9) - (b.fee ?? 1e9));
 const noKey = e.note && /key/i.test(e.note);
 ---
-<Layout lang={lang} title={t(lang, 'ex.title', { exchange: e.name })} description={`${e.name}: USDT and BTC withdrawal fees per network, minimums, Gulf licensing and funding options.`} path={L(`/exchanges/${exchange}/`)} updated={E.generated_at} crumbs={[{ name: e.name, path: L(`/exchanges/${exchange}/`) }]}>
+<Layout lang={lang} title={t(lang, 'ex.title', { exchange: e.name })} description={t(lang, 'ex.description', { exchange: e.name })} path={L(`/exchanges/${exchange}/`)} updated={E.generated_at} crumbs={[{ name: e.name, path: L(`/exchanges/${exchange}/`) }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.exchanges')} · {e.fee_source === 'api' ? 'API' : e.fee_source === 'api+manual' ? t(lang, 'ex.mixed') : t(lang, 'ex.verified')}</p><h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1></div>
   {e.fee_source === 'manual' && <p class="note">{t(lang, 'ex.manual_note')} <a href={e.fee_page} rel="nofollow noopener">{t(lang, 'ex.fee_page')}</a></p>}
   {e.fee_source === 'api+manual' && <p class="note">{t(lang, 'ex.mixed_note')} <a href={e.fee_page} rel="nofollow noopener">{t(lang, 'ex.fee_page')}</a></p>}

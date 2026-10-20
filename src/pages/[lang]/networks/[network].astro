@@ -13,7 +13,7 @@ const L = (p: string) => `/${lang}${p}`;
 const offers = Object.entries(M.assets[main.id].exchanges).map(([id, e]: any) => ({ id, name: e.name, cell: e.cells[network] })).filter((x) => x.cell && x.cell.fee != null).sort((a, b) => a.cell.fee - b.cell.fee);
 const skip = new Set(['note', 'estimation_wallet']);
 ---
-<Layout lang={lang} title={t(lang, 'net.title', { network: N.name, asset: main.symbol })} description={`${N.name}: ${fmtUsd(lang, n.fee_usd)} per ${main.symbol} transfer right now, every asset on this chain, how the fee is made up, and time to confirm.`} path={L(`/networks/${network}/`)} og={`/og/net-${network}.png`} updated={F.generated_at} crumbs={[{ name: N.name, path: L(`/networks/${network}/`) }]}>
+<Layout lang={lang} title={t(lang, 'net.title', { network: N.name, asset: main.symbol })} description={t(lang, 'net.description', { network: N.name, fee: fmtUsd(lang, n.fee_usd), asset: main.symbol })} path={L(`/networks/${network}/`)} og={`/og/net-${network}.png`} updated={F.generated_at} crumbs={[{ name: N.name, path: L(`/networks/${network}/`) }]}>
   <div class="hero"><p class="eyebrow">{main.symbol} · {N.name}</p><h1>{t(lang, 'net.h1', { network: N.name, asset: main.symbol })}</h1></div>
   <div class="grid" style="--n:3">
     <div class="card"><div class="sub">{t(lang, 'net.usd_fee')}</div><div class="fee" data-live-fee={`${main.id}:${network}`}>{fmtUsd(lang, n.fee_usd)}</div><div class="sub">{t(lang, 'observed_at', { time: fmtTime(lang, n.observed_at) })}{n.stale && <span class="stale"> · stale</span>}</div></div>
