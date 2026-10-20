@@ -20,7 +20,7 @@ const noKey = e.note && /key/i.test(e.note);
   </tbody></table></div>
   <h2>{t(lang, 'ex.facts')}</h2>
   <div class="tbl"><table><thead><tr><th>{t(lang, 'ex.region')}</th><th>{t(lang, 'ex.licence')}</th><th>{t(lang, 'ex.verified')}</th></tr></thead><tbody>
-    {e.facts.gulf_licensing.map((g: any) => <tr><td>{g.region}</td><td>{g.status}{g.source && <> · <a href={g.source} rel="nofollow noopener">{t(lang, 'source')}</a></>}</td><td class="meta">{g.verified && g.last_verified ? fmtDate(lang, g.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</td></tr>)}
+    {e.facts.gulf_licensing.map((g: any) => <tr><td>{g.region}</td><td>{g.status}{g.entity && <span class="meta"> ({g.entity})</span>}{g.source && <> · <a href={g.source} rel="nofollow noopener">{t(lang, 'source')}</a></>}</td><td class="meta">{g.verified && g.last_verified ? fmtDate(lang, g.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</td></tr>)}
   </tbody></table></div>
   <dl class="kv" style="margin-top:12px"><dt>{t(lang, 'ex.currencies')}</dt><dd>{e.facts.deposit_currencies.length ? e.facts.deposit_currencies.join(', ') : '–'}</dd><dt>{t(lang, 'ex.p2p')}</dt><dd>{t(lang, e.facts.p2p ? 'ex.yes' : 'ex.no')}</dd><dt>{t(lang, 'ex.verified')}</dt><dd>{e.facts.last_verified ? fmtDate(lang, e.facts.last_verified) : <span class="pill warn">{t(lang, 'ex.unverified')}</span>}</dd></dl>
   <p class="meta"><a href={e.website} rel="nofollow noopener">{e.website}</a></p>
