@@ -26,7 +26,7 @@ export function t(lang: string, key: string, vars: Record<string, string | numbe
 }
 export const fmtUsd = (lang: string, v: number | null | undefined, max = 4) => v == null ? '–' : iso(lang, new Intl.NumberFormat(NUM, { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: v < 0.01 ? max : v < 1 ? 3 : 2 }).format(v));
 export const fmtNum = (lang: string, v: number | null | undefined, max = 6) => v == null ? '–' : iso(lang, new Intl.NumberFormat(NUM, { maximumSignificantDigits: 4, maximumFractionDigits: max }).format(v));
-export const fmtTime = (lang: string, when: string | null | undefined) => when ? iso(lang, new Intl.DateTimeFormat(dateLocale(lang), { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(new Date(when)) + ' UTC') : '–';
+export const fmtTime = (lang: string, when: string | null | undefined) => when ? iso(lang, new Intl.DateTimeFormat(dateLocale(lang), { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC', hour12: lang === 'ar' ? false : undefined }).format(new Date(when)) + ' UTC') : '–';
 export const fmtDate = (lang: string, when: string | null | undefined) => when ? iso(lang, new Intl.DateTimeFormat(dateLocale(lang), { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(when))) : '–';
 export function history() {
   if (!fs.existsSync('data/history/networks.csv')) return [];
