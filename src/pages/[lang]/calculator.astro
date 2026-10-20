@@ -29,6 +29,7 @@ const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt',
   </div>
   <script is:inline define:vars={{ data, S, lang }}>
     var $ = function (id) { return document.getElementById(id); };
+    var pct = function (p) { return (p >= 0.1 ? p.toFixed(2) : Number(p.toPrecision(2)).toString()) + '%'; };
     var usd = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
     var ph = function (s, v) { return s.replace(/\{(\w+)\}/g, function (_, k) { return v[k]; }); };
     function fillNetworks() { var a = data.assets[$('asset').value], sel = $('network'), cur = sel.value; sel.innerHTML = ''; Object.keys(a.networks).forEach(function (id) { var o = document.createElement('option'); o.value = id; o.textContent = a.networks[id].name; sel.appendChild(o); }); if (a.networks[cur]) sel.value = cur; }
@@ -48,7 +49,7 @@ const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt',
         var alts = e.rows.filter(function (x) { return x.asset === sym && x.enabled && x.network !== net && A.networks[x.network]; }).sort(function (a, b) { return a.fee_usd - b.fee_usd; });
         if (alts.length && alts[0].fee_usd < feeU) $('r-alt').textContent = ph(S['calc.alt'], { exchange: e.name, network: A.networks[alts[0].network].name, fee: usd(alts[0].fee_usd) });
       }
-      $('r-fee').textContent = usd(feeU); $('r-pct').textContent = amt > 0 ? (feeU / amt * 100).toFixed(3) + '%' : '–'; $('r-time').textContent = time;
+      $('r-fee').textContent = usd(feeU); $('r-pct').textContent = amt > 0 ? pct(feeU / amt * 100) : '–'; $('r-time').textContent = time;
     }
     $('asset').addEventListener('change', function () { fillNetworks(); calc(); });
     ['amount', 'from', 'network'].forEach(function (id) { $(id).addEventListener('input', calc); $(id).addEventListener('change', calc); });
