@@ -26,7 +26,8 @@ const head = csv[0].split(',');
 const manual = csv.slice(1).map((l) => { const c = l.match(/("[^"]*"|[^,]*)(,|$)/g).map((x) => x.replace(/,$/, '').replace(/^"|"$/g, '')); return Object.fromEntries(head.map((h, i) => [h, c[i] ?? ''])); });
 for (const [ex, f] of Object.entries(facts)) {
   const rec = { id: ex, name: f.name, website: f.website, fee_source: f.fee_source, fee_page: f.fee_page, facts: { gulf_licensing: f.gulf_licensing, deposit_currencies: f.deposit_currencies, p2p: f.p2p, last_verified: f.last_verified || null }, rows: [], observed_at: now, stale: false };
-  if (f.fee_source === 'api' || (ex === 'cryptocom' && process.env.CRYPTOCOM_API_KEY)) {
+  const viaApi = f.fee_source === 'api' || f.fee_source === 'api+manual' || (ex === 'cryptocom' && process.env.CRYPTOCOM_API_KEY);
+  if (viaApi) {
     try {
       const rows = await API[ex](ASSETS);
       rec.rows = rows.map((r) => ({ ...r, observed_at: now, flags: validate(r) }));
@@ -35,8 +36,12 @@ for (const [ex, f] of Object.entries(facts)) {
       if (e.noKey) { rec.rows = old ? old.rows : []; rec.stale = !!old; rec.note = 'API key not configured yet'; alerts.push({ exchange: ex, type: 'no_key', detail: e.message, at: now }); }
       else { rec.rows = old ? old.rows : []; rec.stale = true; rec.stale_reason = e.message; alerts.push({ exchange: ex, type: 'source_failed', detail: e.message, at: now }); }
     }
-  } else {
+  }
+  // Manual rows: the whole sheet for manual exchanges; for 'api+manual' only the asset/network cells the API did not return
+  // (e.g. Bybit: our key is on the EU entity, whose list is shorter than what bybit.com offers Gulf users).
+  if (!viaApi || f.fee_source === 'api+manual') {
     for (const m of manual.filter((r) => r.exchange === ex)) {
+      if (viaApi && rec.rows.some((r) => r.asset === m.asset && r.network === m.network)) continue;
       const row = { exchange: ex, asset: m.asset, network: m.network, network_raw: m.network, fee: m.fee === '' ? null : +m.fee, fee_asset: m.fee_asset || m.asset, min: m.min === '' ? null : +m.min, withdraw_enabled: m.withdraw_enabled !== 'false', manual: true, last_verified: m.last_verified || null, source: m.source_url, notes: m.notes, observed_at: m.last_verified || null, flags: [] };
       if (!NETWORK_IDS.includes(row.network)) { unmapped.push({ exchange: ex, name: m.network }); continue; }
       if (row.fee == null) row.flags.push('not_filled_in');
