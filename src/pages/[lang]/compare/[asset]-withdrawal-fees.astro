@@ -7,7 +7,7 @@ const F = fees(), M = matrix(), m = M.assets[asset], A = F.assets[asset];
 const L = (p: string) => `/${lang}${p}`;
 const exs = Object.entries(m.exchanges) as any[];
 ---
-<Layout lang={lang} title={t(lang, 'compare.title', { asset: A.symbol })} description={t(lang, 'compare.intro', { asset: A.symbol })} path={L(`/compare/${asset}-withdrawal-fees/`)} updated={M.generated_at} crumbs={[{ name: t(lang, 'compare.title', { asset: A.symbol }), path: L(`/compare/${asset}-withdrawal-fees/`) }]}>
+<Layout lang={lang} title={t(lang, 'compare.title', { asset: A.symbol })} description={t(lang, 'compare.description', { asset: A.symbol })} path={L(`/compare/${asset}-withdrawal-fees/`)} updated={M.generated_at} crumbs={[{ name: t(lang, 'compare.title', { asset: A.symbol }), path: L(`/compare/${asset}-withdrawal-fees/`) }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.compare')} · {A.symbol}</p><h1>{t(lang, 'compare.h1', { asset: A.symbol })}</h1>
   <p class="lead">{t(lang, 'compare.intro', { asset: A.symbol })}</p>
   <p class="meta">{t(lang, 'compare.other')}: {assetList().filter((a) => a.id !== asset).map((a) => <a href={L(`/compare/${a.id}-withdrawal-fees/`)} style="margin-inline-end:10px">{a.symbol}</a>)}</p></div>
