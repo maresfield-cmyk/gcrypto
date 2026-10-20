@@ -25,7 +25,7 @@ const csv = fs.readFileSync('data/manual/fees-manual.csv', 'utf8').trim().split(
 const head = csv[0].split(',');
 const manual = csv.slice(1).map((l) => { const c = l.match(/("[^"]*"|[^,]*)(,|$)/g).map((x) => x.replace(/,$/, '').replace(/^"|"$/g, '')); return Object.fromEntries(head.map((h, i) => [h, c[i] ?? ''])); });
 for (const [ex, f] of Object.entries(facts)) {
-  const rec = { id: ex, name: f.name, website: f.website, fee_source: f.fee_source, fee_page: f.fee_page, facts: { gulf_licensing: f.gulf_licensing, deposit_currencies: f.deposit_currencies, p2p: f.p2p, last_verified: f.last_verified || null }, rows: [], observed_at: now, stale: false };
+  const rec = { id: ex, name: f.name, website: f.website, fee_source: f.fee_source, fee_page: f.fee_page, facts: { gulf_licensing: f.gulf_licensing, deposit_currencies: f.deposit_currencies, deposits: f.deposits || [], funding_source: f.funding_source || null, p2p: f.p2p, last_verified: f.last_verified || null }, rows: [], observed_at: now, stale: false };
   const viaApi = f.fee_source === 'api' || f.fee_source === 'api+manual' || (ex === 'cryptocom' && process.env.CRYPTOCOM_API_KEY);
   if (viaApi) {
     try {
