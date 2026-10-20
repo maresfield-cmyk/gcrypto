@@ -157,6 +157,16 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   footer.bottom p { margin: 4px 0; max-width: 80ch; }
   details.fold > summary { cursor: pointer; margin: 28px 0 10px; list-style: none; } details.fold > summary::before { content: "▸ "; color: var(--muted); } details.fold[open] > summary::before { content: "▾ "; } details.fold > summary::-webkit-details-marker { display: none; }
   .spark { width: 120px; height: 32px; display: block; margin-top: 8px; color: var(--accent); }
+  /* Facts card (exchange pages): label / value rows that wrap, currencies as chips */
+  .facts { margin-top: 12px; padding: 4px 16px; display: grid; }
+  .facts .row { display: grid; grid-template-columns: minmax(120px, 160px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 0; border-block-end: 1px solid var(--line); align-items: start; }
+  .facts .row:last-child { border-block-end: 0; }
+  .facts .k { color: var(--muted); font-size: 14px; padding-top: 2px; }
+  .facts .v { font-size: 14.5px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .facts .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .facts .chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--tint); border: 1px solid var(--box); font-size: 13px; }
+  .facts .chip small { color: var(--muted); font-size: 12px; }
+  @media (max-width: 640px) { .facts { padding: 2px 13px; } .facts .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
   dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; font-size: 14.5px; } dl.kv dt { color: var(--muted); min-width: 0; } dl.kv dd { margin: 0; text-align: end; white-space: nowrap; }
   /* Phones: two cards per row, tighter spacing, the six navigation links as a 3-column grid (no scrolling) */
   @media (max-width: 640px) {
