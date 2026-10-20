@@ -48,5 +48,8 @@ Bybit: the account is on the EU entity, so the key works only against `api.bybit
 ## Binance from GitHub's US runners
 `api.binance.com` (the signed API) returns HTTP 451 to US addresses, which is where GitHub-hosted runners live. Since 2026-10-20 the fetcher uses the public endpoint behind binance.com's fee page first (no key, works from the US, identical figures) and only falls back to the signed API. If the public endpoint ever disappears, the signed fallback still works from your Mac (`node scripts/run.mjs all`), or switch Binance to `fee_source: manual`.
 
+## Who commits data
+The scheduled workflow commits `data/` (out, raw, history) to `main` after every run. Do not commit data files from your Mac any more: a local run is fine for checking, but commit only code, config and `data/manual/*`, then `git pull --rebase` before pushing. If a data conflict ever happens, keep the workflow's version and merge `data/history/networks.csv` as the union of both files.
+
 ## Rebuild policy
 The site is rebuilt and published only when a network fee moved more than 5% or an alert fired (`data/out/run.json` → `rebuild`), or on the 6-hourly exchange run. Between rebuilds the pages refresh their numbers from `/data/networks.json` in the browser.
