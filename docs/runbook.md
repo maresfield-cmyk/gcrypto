@@ -45,8 +45,8 @@ OKX: the account is on the EEA entity, so the key works only against `eea.okx.co
 
 Bybit: the account is on the EU entity, so the key works only against `api.bybit.eu` (the default in `src/fetch/exchanges/bybit.mjs`); `api.bybit.com` answers `10003 API key is invalid`. Permission needed: Assets → Wallet → Account Transfer (read-only). A key without an IP restriction expires after 90 days: created 2026-10-20, renew by 2027-01-15.
 
-## Known issue: Binance from GitHub's US runners
-`api.binance.com` returns HTTP 451 to US addresses. If the Binance step fails in Actions: (a) run the job on a self-hosted runner outside the US (a Mac that is always on works), or (b) set `fee_source: manual` for Binance in `exchanges.yml` and keep its rows in the manual sheet.
+## Binance from GitHub's US runners
+`api.binance.com` (the signed API) returns HTTP 451 to US addresses, which is where GitHub-hosted runners live. Since 2026-10-20 the fetcher uses the public endpoint behind binance.com's fee page first (no key, works from the US, identical figures) and only falls back to the signed API. If the public endpoint ever disappears, the signed fallback still works from your Mac (`node scripts/run.mjs all`), or switch Binance to `fee_source: manual`.
 
 ## Rebuild policy
 The site is rebuilt and published only when a network fee moved more than 5% or an alert fired (`data/out/run.json` → `rebuild`), or on the 6-hourly exchange run. Between rebuilds the pages refresh their numbers from `/data/networks.json` in the browser.
