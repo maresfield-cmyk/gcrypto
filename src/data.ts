@@ -29,3 +29,11 @@ export function history() {
 /** cells of one asset across its networks, cheapest first */
 export const cellsOf = (F: any, assetId: string) => Object.values(F.assets[assetId].networks).filter((x: any) => x.fee_usd != null).sort((a: any, b: any) => a.fee_usd - b.fee_usd) as any[];
 export const cheapestOf = (F: any, assetId: string) => cellsOf(F, assetId)[0];
+
+// Percent of an amount: two decimals normally, but tiny shares keep two significant figures (0.0032% rather than 0.00%).
+export function fmtPct(lang: string, feeUsd: number, amount: number): string {
+  const p = (feeUsd / amount) * 100;
+  if (!isFinite(p)) return '–';
+  const digits = p >= 0.1 ? 2 : Math.max(2, 1 - Math.floor(Math.log10(p || 1)) + 1);
+  return new Intl.NumberFormat(lang, { minimumFractionDigits: 2, maximumFractionDigits: Math.min(digits, 6) }).format(p) + '%';
+}
