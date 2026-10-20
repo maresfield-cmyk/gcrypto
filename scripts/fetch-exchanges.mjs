@@ -42,9 +42,9 @@ for (const [ex, f] of Object.entries(facts)) {
   if (!viaApi || f.fee_source === 'api+manual') {
     for (const m of manual.filter((r) => r.exchange === ex)) {
       if (viaApi && rec.rows.some((r) => r.asset === m.asset && r.network === m.network)) continue;
-      const row = { exchange: ex, asset: m.asset, network: m.network, network_raw: m.network, fee: m.fee === '' ? null : +m.fee, fee_asset: m.fee_asset || m.asset, min: m.min === '' ? null : +m.min, withdraw_enabled: m.withdraw_enabled !== 'false', manual: true, last_verified: m.last_verified || null, source: m.source_url, notes: m.notes, observed_at: m.last_verified || null, flags: [] };
+      const row = { exchange: ex, asset: m.asset, network: m.network, network_raw: m.network, fee: m.fee === '' || m.fee === 'network' ? null : +m.fee, pass_through: m.fee === 'network', fee_asset: m.fee_asset || m.asset, min: m.min === '' ? null : +m.min, withdraw_enabled: m.withdraw_enabled !== 'false', manual: true, last_verified: m.last_verified || null, source: m.source_url, notes: m.notes, observed_at: m.last_verified || null, flags: [] };
       if (!NETWORK_IDS.includes(row.network)) { unmapped.push({ exchange: ex, name: m.network }); continue; }
-      if (row.fee == null) row.flags.push('not_filled_in');
+      if (row.fee == null && !row.pass_through) row.flags.push('not_filled_in');   // fee 'network' in the sheet = the exchange passes the live network fee through (no fixed figure)
       else row.flags.push(...validate(row));
       if (!row.last_verified) row.flags.push('never_verified');
       else if (Date.now() - Date.parse(row.last_verified) > 14 * 86400e3) { row.flags.push('manual_row_older_than_14d'); alerts.push({ exchange: ex, type: 'manual_stale', detail: `${m.asset} ${m.network} last verified ${m.last_verified}`, at: now }); }
@@ -66,7 +66,7 @@ for (const a of ASSET_CFG) {
   const nets = Object.keys(a.on);
   const m = { symbol: a.symbol, name: a.name, networks: nets, exchanges: {} };
   for (const [ex, rec] of Object.entries(out.exchanges)) {
-    m.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(nets.map((n) => { const r = rec.rows.find((x) => x.asset === a.symbol && x.network === n); return [n, r ? { fee: r.fee, fee_usd: r.fee_usd, min: r.min, enabled: r.withdraw_enabled, flags: r.flags, last_verified: r.last_verified || r.observed_at } : null]; })) };
+    m.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(nets.map((n) => { const r = rec.rows.find((x) => x.asset === a.symbol && x.network === n); return [n, r ? { fee: r.fee, fee_usd: r.fee_usd, min: r.min, pass_through: !!r.pass_through, enabled: r.withdraw_enabled, flags: r.flags, last_verified: r.last_verified || r.observed_at } : null]; })) };
   }
   m.cheapest_per_network = Object.fromEntries(nets.map((n) => { const c = Object.entries(m.exchanges).map(([ex, e]) => [ex, e.cells[n]]).filter(([, v]) => v && v.enabled && v.fee != null && !v.flags.length).sort((x, y) => x[1].fee - y[1].fee); return [n, c.length ? { exchange: c[0][0], fee: c[0][1].fee, fee_usd: c[0][1].fee_usd } : null]; }));
   matrix.assets[a.id] = m;
@@ -78,7 +78,7 @@ fs.writeFileSync('data/out/alerts-exchanges.json', JSON.stringify(alerts, null, 
 for (const [aid, m] of Object.entries(matrix.assets)) {
   console.log(`\n${m.symbol} withdrawal fees (in ${m.symbol}; - = not offered; ? = not filled in; * = stale/no key):`);
   console.log('exchange  '.padEnd(11) + m.networks.map((n) => n.slice(0, 8).padStart(9)).join(''));
-  for (const [ex, e] of Object.entries(m.exchanges)) console.log((ex + (e.stale ? '*' : '')).padEnd(11) + m.networks.map((n) => { const v = e.cells[n]; return (v == null ? '-' : v.fee == null ? '?' : (v.enabled ? '' : '(off)') + String(v.fee)).padStart(9); }).join(''));
+  for (const [ex, e] of Object.entries(m.exchanges)) console.log((ex + (e.stale ? '*' : '')).padEnd(11) + m.networks.map((n) => { const v = e.cells[n]; return (v == null ? '-' : v.fee == null ? (v.pass_through ? 'net' : '?') : (v.enabled ? '' : '(off)') + String(v.fee)).padStart(9); }).join(''));
 }
 console.log('\nunmapped names:', unmapped.length ? JSON.stringify(unmapped) : 'none');
 console.log('alerts:', alerts.length, alerts.map((a) => a.type + (a.exchange ? ':' + a.exchange : '')).join(', '));

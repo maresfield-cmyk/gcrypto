@@ -16,7 +16,7 @@ node scripts/export-strings.mjs # strings + context for translators
 ```
 
 ## Weekly (20 minutes)
-1. Open the manual exchanges' fee pages (links in `data/manual/exchanges.yml`): Bybit (the Crypto Deposit/Withdrawal Status page: click a coin to see each chain's fee and minimum), Rain, BitOasis, CoinMENA, Crypto.com.
+1. Open the manual exchanges' fee pages (links in `data/manual/exchanges.yml`): Bybit (the Crypto Deposit/Withdrawal Status page: click a coin to see each chain's fee and minimum), Rain, BitOasis, CoinMENA, Crypto.com. A fee of `network` in the sheet means the exchange passes the live network fee through (BitOasis); re-check that its page still says so.
 2. Compare with `data/manual/fees-manual.csv`; correct any fee or minimum; set `last_verified` to today on every row you checked (even if unchanged). The site shows the date; rows older than 14 days email you.
 3. Glance at the week's alert emails. `data/logs/alerts.log` has the full list.
 
