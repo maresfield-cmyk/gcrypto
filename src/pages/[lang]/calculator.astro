@@ -30,7 +30,7 @@ const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt',
   <script is:inline define:vars={{ data, S, lang }}>
     var $ = function (id) { return document.getElementById(id); };
     var pct = function (p) { return (p >= 0.1 ? p.toFixed(2) : Number(p.toPrecision(2)).toString()) + '%'; };
-    var usd = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
+    var iso = function (x) { return lang === 'ar' ? '\u2066' + x + '\u2069' : x; }; var usd = function (v) { return iso(new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v)); };
     var ph = function (s, v) { return s.replace(/\{(\w+)\}/g, function (_, k) { return v[k]; }); };
     function fillNetworks() { var a = data.assets[$('asset').value], sel = $('network'), cur = sel.value; sel.innerHTML = ''; Object.keys(a.networks).forEach(function (id) { var o = document.createElement('option'); o.value = id; o.textContent = a.networks[id].name; sel.appendChild(o); }); if (a.networks[cur]) sel.value = cur; }
     function calc() {

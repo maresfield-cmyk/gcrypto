@@ -16,7 +16,7 @@ const { lang, title, refresh } = Astro.props;
   .s { color: var(--muted); font-size: 12px; margin-top: 4px; } a { color: var(--accent); }
 </style></head><body><div class="w"><slot /><div class="s" data-credit set:html={t(lang, 'widget.credit', { site: `<a href="${SITE_URL}/${lang}/" target="_blank" rel="noopener">${t(lang, 'site.name')}</a>` })}></div></div>
 <script is:inline define:vars={{ refresh, lang }}>
-  (function () { var fmt = function (v) { return new Intl.NumberFormat(lang, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
+  (function () { var fmt = function (v) { return new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v); };
     setInterval(function () { fetch('/data/fees.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
       var p = refresh.split(':');
       if (p[0] === 'cheapest') { var b = Object.values(d.assets[p[1]].networks).filter(function (n) { return n.fee_usd != null; }).sort(function (a, c) { return a.fee_usd - c.fee_usd; })[0]; if (b) { document.querySelector('.n').textContent = b.name; document.querySelector('.f').textContent = fmt(b.fee_usd); } }
