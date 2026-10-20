@@ -41,6 +41,8 @@ The site keeps the last good value with a visible timestamp; you get an email af
 ## Rotating API keys
 Create the new read-only key (no trade/withdraw permission), update the GitHub secret and your local `.env`, run the workflow by hand (Actions → update → Run workflow), then delete the old key at the exchange.
 
+Bybit: the account is on the EU entity, so the key works only against `api.bybit.eu` (the default in `src/fetch/exchanges/bybit.mjs`); `api.bybit.com` answers `10003 API key is invalid`. Permission needed: Assets → Wallet → Account Transfer (read-only). A key without an IP restriction expires after 90 days: created 2026-10-20, renew by 2027-01-15.
+
 ## Known issue: Binance from GitHub's US runners
 `api.binance.com` returns HTTP 451 to US addresses. If the Binance step fails in Actions: (a) run the job on a self-hosted runner outside the US (a Mac that is always on works), or (b) set `fee_source: manual` for Binance in `exchanges.yml` and keep its rows in the manual sheet.
 
