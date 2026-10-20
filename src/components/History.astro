@@ -20,5 +20,17 @@ const [h1a, h1b] = t(lang, 'history.h1', { asset: '\u0000' }).split('\u0000');
     {winners.map((w) => <tr><td>{fmtDate(lang, w.week)}</td><td><a href={L(`/networks/${w.network}/`)}>{F.networks[w.network].name}</a></td><td class="num">{fmtUsd(lang, w.avg)}</td></tr>)}
     {!winners.length && <tr><td colspan="3" class="meta">{t(lang, 'hub.no_data')}</td></tr>}
   </tbody></table></div>
-  {Object.values(A.networks).map((n: any) => { const r = rows.filter((x) => x.network === n.network); return <div><h2><a href={L(`/networks/${n.network}/`)}>{n.name}</a></h2>{r.length ? <Chart lang={lang} rows={r} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}</div>; })}
+  <h2>{t(lang, 'history.by_network')}</h2>
+  <div class="hist">
+    {Object.values(A.networks).map((n: any) => { const r = rows.filter((x) => x.network === n.network); const last = r[r.length - 1]; return <div class="card"><div class="head"><a class="name" href={L(`/networks/${n.network}/`)}>{n.name}</a>{last && <span class="fee num">{fmtUsd(lang, last.fee_usd)}</span>}</div>{r.length ? <Chart lang={lang} rows={r} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}</div>; })}
+  </div>
+  <style>
+    .hist { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hist .card { display: grid; gap: 8px; align-content: start; }
+    .hist .head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .hist .head .name { font-size: 15px; text-decoration: none; }
+    .hist .head .fee { font-size: 20px; margin: 0; }
+    .hist figcaption { color: var(--muted); }
+    @media (max-width: 760px) { .hist { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+  </style>
 </Layout>
