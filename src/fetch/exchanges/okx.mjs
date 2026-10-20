@@ -1,12 +1,13 @@
 // OKX: GET /api/v5/asset/currencies, signed headers (base64 HMAC-SHA256 of timestamp + method + path) with a READ-ONLY key + passphrase.
+// Keys only work on the host of the entity the account belongs to: ours is OKX EEA (eea.okx.com); global accounts use www.okx.com. Set OKX_API_HOST to switch.
 import { getJson, rawRef } from '../../lib/http.mjs';
 import { networkId } from '../../lib/normalise.mjs';
 import { hmacB64, env, NoKey } from '../../lib/sign.mjs';
 export async function okx(assets) {
-  const key = env('OKX_API_KEY'), secret = env('OKX_API_SECRET'), pass = env('OKX_PASSPHRASE');
+  const key = env('OKX_API_KEY'), secret = env('OKX_API_SECRET'), pass = env('OKX_PASSPHRASE'), host = env('OKX_API_HOST') || 'eea.okx.com';
   if (!key || !secret || !pass) throw new NoKey('okx');
   const path = `/api/v5/asset/currencies?ccy=${assets.join(',')}`, ts = new Date().toISOString();
-  const j = await getJson('okx-currencies', `https://www.okx.com${path}`, { headers: { 'OK-ACCESS-KEY': key, 'OK-ACCESS-SIGN': hmacB64(secret, ts + 'GET' + path), 'OK-ACCESS-TIMESTAMP': ts, 'OK-ACCESS-PASSPHRASE': pass } });
+  const j = await getJson('okx-currencies', `https://${host}${path}`, { headers: { 'OK-ACCESS-KEY': key, 'OK-ACCESS-SIGN': hmacB64(secret, ts + 'GET' + path), 'OK-ACCESS-TIMESTAMP': ts, 'OK-ACCESS-PASSPHRASE': pass } });
   if (j.code !== '0') throw new Error(`okx ${j.code}: ${j.msg}`);
   const rows = [];
   for (const c of j.data || []) {
