@@ -133,6 +133,8 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .copy { position: absolute; inset-inline-end: 10px; top: 10px; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border-radius: 9px; border: 1px solid var(--box); background: var(--card); color: var(--fg-2); font: 600 12.5px/1 inherit; font-family: inherit; cursor: pointer; }
   .copy:hover { border-color: var(--accent); color: var(--fg); } .copy[data-done="1"] { border-color: var(--accent); color: var(--accent); }
   .copy svg { width: 14px; height: 14px; }
+  /* The code itself always reads left-to-right, so on Arabic pages the button stays at the physical right, where the code ends */
+  [dir="rtl"] .copy { inset-inline-end: auto; inset-inline-start: 10px; }
   code, pre, textarea.code { font-family: var(--mono); font-size: 13px; }
   pre, textarea.code { background: var(--card); border: 1px solid var(--box); border-radius: 12px; padding: 14px; overflow: auto; width: 100%; direction: ltr; text-align: left; color: var(--fg-2); }
   button, select, input { font: inherit; }
