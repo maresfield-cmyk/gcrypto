@@ -15,7 +15,7 @@ const [h1a, h1b] = t(lang, 'hub.h1', { asset: '\u0000' }).split('\u0000');
 const btc = asset === 'btc' ? A.networks.bitcoin : null;
 const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd).filter((v: any) => typeof v === 'number').length >= 2).slice(0, 2);   // a card with a single line says nothing: hidden
 ---
-<Layout lang={lang} title={t(lang, 'hub.title', { asset: A.symbol })} description={t(lang, 'hub.intro', { asset: A.symbol })} path={path} og={`/og/${asset}.png`}>
+<Layout lang={lang} title={t(lang, 'hub.title', { asset: A.symbol })} description={t(lang, 'hub.description', { asset: A.symbol })} path={path} og={`/og/${asset}.png`}>
   <div class="hero">
     <p class="eyebrow">{t(lang, 'updated', { time: fmtTime(lang, F.generated_at) })}</p>
     <h1 aria-label={t(lang, 'hub.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} />{h1b}</h1>

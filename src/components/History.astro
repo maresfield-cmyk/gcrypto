@@ -13,7 +13,7 @@ for (const r of rows) { (weeks[weekOf(r.ts)] ??= {})[r.network] ??= []; weeks[we
 const winners = Object.entries(weeks).sort().reverse().map(([w, m]) => { const avg = Object.entries(m).map(([n, v]) => [n, v.reduce((a, b) => a + b, 0) / v.length] as [string, number]).sort((a, b) => a[1] - b[1]); return { week: w, network: avg[0][0], avg: avg[0][1] }; });
 const [h1a, h1b] = t(lang, 'history.h1', { asset: '\u0000' }).split('\u0000');
 ---
-<Layout lang={lang} title={t(lang, 'history.title')} description={t(lang, 'history.h1', { asset: A.symbol })} path={path} updated={F.generated_at} crumbs={[{ name: t(lang, 'history.title'), path }]}>
+<Layout lang={lang} title={t(lang, 'history.title')} description={t(lang, 'history.description', { asset: A.symbol })} path={path} updated={F.generated_at} crumbs={[{ name: t(lang, 'history.title'), path }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.history')}</p><h1 aria-label={t(lang, 'history.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} route="history" />{h1b}</h1></div>
   <h2>{t(lang, 'history.weekly')}</h2>
   <div class="tbl"><table><thead><tr><th>{t(lang, 'history.week')}</th><th>{t(lang, 'history.winner')}</th><th class="num">{t(lang, 'history.avg')}</th></tr></thead><tbody>
