@@ -13,7 +13,7 @@ const nets = [
 ];
 ---
 <div class="share" role="group" aria-label={t(lang, 'share.label')}>
-  {nets.map((n) => <a class="share-btn" href={n.href} target="_blank" rel="noopener nofollow" aria-label={`${t(lang, 'share.label')} · ${n.name}`} title={n.name} style={`--c:${n.color}`}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={n.icon}/></svg></a>)}
+  {nets.map((n) => <a class="share-btn" href={n.href} target="_blank" rel="noopener nofollow" aria-label={`${t(lang, 'share.label')} · ${n.name}`} title={n.name} data-net={n.id} style={`--c:${n.color}`}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={n.icon}/></svg></a>)}
   <button type="button" class="share-btn share-copy" data-url={url} data-label={t(lang, 'share.copy')} data-done={t(lang, 'share.copied')} aria-label={t(lang, 'share.copy')} title={t(lang, 'share.copy')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.1-.1l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg><span class="share-toast" aria-live="polite"></span></button>
 </div>
 <script is:inline>
@@ -29,6 +29,6 @@ const nets = [
   .share-btn svg { width: 18px; height: 18px; }
   .share-copy { color: var(--accent-text); } .share-copy.done { background: var(--accent); color: #fff; border-color: var(--accent); }
   .share-toast { position: absolute; top: calc(100% + 6px); inset-inline-end: 0; white-space: nowrap; font: 600 12px/1 inherit; font-family: inherit; color: var(--accent-text); }
-  @media (prefers-color-scheme: dark) { .share-btn[style*="#000000"] { --c: #e6edf7; } }
+  @media (prefers-color-scheme: dark) { .share-btn[data-net="x"] { color: #e6edf7; } .share-btn[data-net="x"]:hover { background: #e6edf7; color: #0b0f17; border-color: #e6edf7; } }   /* X's black logo on the dark theme */
   @media (max-width: 640px) { .share-btn { width: 32px; height: 32px; } .share-btn svg { width: 16px; height: 16px; } }
 </style>
