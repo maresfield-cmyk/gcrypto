@@ -2,8 +2,6 @@
 // Page shell: header nav, footer, dark mode, logical CSS (RTL-ready), structured data, client-side refresh of live numbers.
 import '@fontsource-variable/inter';
 import '@fontsource-variable/noto-sans-arabic';
-import interWoff from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import arabicWoff from '@fontsource-variable/noto-sans-arabic/files/noto-sans-arabic-arabic-wght-normal.woff2?url';
 import { t, dir, LANGS, LANG_NAMES, SITE_URL, fmtTime } from '../data';
 interface Props { lang: string; title: string; description: string; path: string; og?: string; updated?: string; crumbs?: { name: string; path: string }[]; jsonld?: object[] }
 const { lang, title, description, path, og, updated, crumbs = [], jsonld = [] } = Astro.props;
@@ -20,7 +18,6 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preload" as="font" type="font/woff2" crossorigin href={interWoff}>{lang === 'ar' && <link rel="preload" as="font" type="font/woff2" crossorigin href={arabicWoff} />}
 <title>{fullTitle}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={`${SITE_URL}${path}`}>
