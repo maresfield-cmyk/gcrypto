@@ -21,6 +21,7 @@ const jobs = [];
 jobs.push(['default', svg(T['site.name'], T['site.tagline'], `crypto.gulfarcade.com · ${when}`)]);
 for (const a of Object.values(F.assets)) { const b = cheapest(a); jobs.push([a.id, svg(tt('og.cost', { asset: a.symbol }), b ? tt('og.cheapest', { network: b.name, fee: usd(b.fee_usd) }) : '', `crypto.gulfarcade.com · ${when}`)]); }
 const D = Object.values(F.assets).find((a) => a.default);
-for (const n of Object.values(D.networks)) if (n.fee_usd != null) jobs.push(['net-' + n.network, svg(tt('og.net', { network: n.name, asset: D.symbol, fee: usd(n.fee_usd) }), `${new Intl.NumberFormat('en', { maximumSignificantDigits: 4 }).format(n.fee_native)} ${n.native} · ~${n.eta_min} min to credit`, `crypto.gulfarcade.com · ${when}`)]);
+const seen = new Set();
+for (const a of [D, ...Object.values(F.assets).filter((x) => x !== D)]) for (const n of Object.values(a.networks)) if (n.fee_usd != null && !seen.has(n.network) && seen.add(n.network)) jobs.push(['net-' + n.network, svg(tt('og.net', { network: n.name, asset: a.symbol, fee: usd(n.fee_usd) }), `${new Intl.NumberFormat('en', { maximumSignificantDigits: 4 }).format(n.fee_native)} ${n.native} · ~${n.eta_min} min to credit`, `crypto.gulfarcade.com · ${when}`)]);
 for (const [name, s] of jobs) await sharp(Buffer.from(s)).png({ compressionLevel: 9 }).toFile(`public/og/${name}.png`);
 console.log(`published ${jobs.length} OG images + data json`);
