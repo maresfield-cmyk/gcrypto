@@ -1,22 +1,24 @@
 # Scheduled data runs. Every 15 min: network fees + prices; every 6 h: exchange fees too (plus history rollup); manual trigger.
-# Writes data/history + data/out back to the repo, then publishes the built site to GitHub Pages only when a value moved meaningfully.
+# Writes data/history + data/out back to the repo, then publishes the built site to GitHub Pages on every run (so "Updated" is the last check).
+# Each run queues the next one (last step); the cron entries are the backup that restarts the chain.
 # Setup once: repo Settings -> Pages -> Source "GitHub Actions"; custom domain crypto.gulfarcade.com (public/CNAME) with a DNS CNAME to <user>.github.io.
 # NOTE: GitHub-hosted runners are in the US and api.binance.com refuses US addresses (HTTP 451). If Binance fails here,
 # docs/runbook.md lists the options (self-hosted runner, or Binance via the manual sheet).
 name: update
 on:
   schedule:
-    - cron: '*/15 * * * *'        # networks
+    - cron: '4,19,34,49 * * * *'  # networks, plus exchanges when 6 h old (off the hour: GitHub drops more runs at :00)
     - cron: '7 */6 * * *'         # networks + exchanges
   workflow_dispatch:
     inputs:
-      mode: { description: 'networks | all', default: 'all' }
+      mode: { description: 'networks | all | auto', default: 'all' }
+      chain: { description: 'queue the next run for the next quarter hour', default: 'true' }
 concurrency: { group: update, cancel-in-progress: false }
-permissions: { contents: write, pages: write, id-token: write }
+permissions: { contents: write, pages: write, id-token: write, actions: write }
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -46,14 +48,16 @@ jobs:
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
         run: |
-          MODE="${{ github.event.inputs.mode || (github.event.schedule == '7 */6 * * *' && 'all' || 'networks') }}"
+          MODE="${{ github.event.inputs.mode || (github.event.schedule == '7 */6 * * *' && 'all' || 'auto') }}"
           node scripts/run.mjs "$MODE"
       - name: Commit data
         run: |
           git config user.name "gcrypto-bot" && git config user.email "bot@users.noreply.github.com"
           git add data/history data/out data/raw/*/latest.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "data: $(date -u +%FT%TZ) [skip ci]" && git push
-      - name: Upload site (only when values moved)
+          git diff --cached --quiet || git commit -m "data: $(date -u +%FT%TZ) [skip ci]"
+          # a code push can land while this run is going: rebase onto it and retry instead of failing
+          for i in 1 2 3; do git push && break; git pull --rebase -X theirs origin main; done
+      - name: Upload site
         if: ${{ hashFiles('dist/index.html') != '' }}
         uses: actions/upload-pages-artifact@v3
         with: { path: dist }
@@ -63,3 +67,11 @@ jobs:
       - name: Keep raw responses for 90 days
         uses: actions/upload-artifact@v4
         with: { name: 'raw-${{ github.run_id }}', path: data/raw, retention-days: 90, if-no-files-found: ignore }
+      - name: Queue the next run (next quarter hour)
+        if: ${{ always() && github.event.inputs.chain != 'false' }}
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          # GitHub's schedule fires this repo only every 1-6 h, so each run starts the next at 4/19/34/49 past the hour.
+          # The concurrency group keeps one run going and at most one waiting, so the chain cannot multiply; cron restarts it if it stops.
+          now=$(date -u +%s); slot=$(( (now - 240) / 900 * 900 + 900 + 240 )); sleep $(( slot - now ))
+          gh workflow run update.yml --repo "$GITHUB_REPOSITORY" -f mode=auto -f chain=true
