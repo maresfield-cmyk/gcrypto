@@ -51,5 +51,8 @@ Bybit: the account is on the EU entity, so the key works only against `api.bybit
 ## Who commits data
 The scheduled workflow commits `data/` (out, raw, history) to `main` after every run. Do not commit data files from your Mac any more: a local run is fine for checking, but commit only code, config and `data/manual/*`, then `git pull --rebase` before pushing. If a data conflict ever happens, keep the workflow's version and merge `data/history/networks.csv` as the union of both files.
 
+## Telegram channel and bot
+`scripts/telegram.mjs` runs at the end of every scheduled run. It posts a digest to the channel (`TELEGRAM_CHANNEL`) once a day, on the first run after 04:00 UTC (08:00 in the Gulf), and an alert when a USDT network fee is at least 50% and 5 cents away from its level 24 hours earlier (at most one per network per 6 hours). State is in `data/out/telegram-state.json`. `node scripts/telegram.mjs digest` posts a digest now; `node scripts/telegram.mjs setup` re-applies the bot's commands, descriptions and the menu button that opens the site as a Mini App. The bot has no server behind it, so it does not answer messages; the menu button and the channel are the product. Token: @BotFather → the bot → API Token; the bot must be an administrator of the channel.
+
 ## Rebuild policy
 The site is rebuilt and published only when a network fee moved more than 5% or an alert fired (`data/out/run.json` → `rebuild`), or on the 6-hourly exchange run. Between rebuilds the pages refresh their numbers from `/data/networks.json` in the browser.

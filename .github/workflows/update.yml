@@ -42,6 +42,8 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
         run: |
           MODE="${{ github.event.inputs.mode || (github.event.schedule == '7 */6 * * *' && 'all' || 'networks') }}"

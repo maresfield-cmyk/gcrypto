@@ -8,6 +8,7 @@ const started = Date.now();
 sh('node scripts/fetch-networks.mjs');
 if (mode === 'all') { sh('node scripts/fetch-exchanges.mjs'); sh('node scripts/rollup.mjs'); }
 sh('node scripts/alert.mjs');
+sh('node scripts/telegram.mjs auto');   // channel digest once a day + sharp-move alerts; no-op without a token
 const net = JSON.parse(fs.readFileSync('data/out/networks.json'));
 const rebuild = mode === 'all' || net.rebuild.needed;
 fs.writeFileSync('data/out/run.json', JSON.stringify({ ran_at: new Date().toISOString(), mode, seconds: Math.round((Date.now() - started) / 1000), rebuild, moved: net.rebuild.moved }, null, 1));
