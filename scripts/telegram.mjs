@@ -73,9 +73,8 @@ async function post(text) { return api('sendMessage', { chat_id: CHANNEL, text, 
 if (mode === 'setup') {
   // Bot profile: commands, descriptions in both languages, and the menu button that opens the site as a Mini App.
   await api('setMyCommands', { commands: [{ command: 'start', description: 'Live crypto fees · رسوم التحويل الآن' }] });
-  await api('setMyDescription', { description: 'Live cost to send USDT, BTC and more on every major network, and the cheapest exchange to withdraw from. Updated every 15 minutes. Free. A Gulf Arcade project.' });
-  await api('setMyDescription', { language_code: 'ar', description: 'تكلفة إرسال USDT وBTC وغيرها على الشبكات الرئيسية الآن، وأرخص منصة للسحب. يتحدث كل 15 دقيقة. مجاني. مشروع من Gulf Arcade.' });
-  await api('setMyShortDescription', { short_description: 'Live crypto transfer fees · رسوم التحويل الآن' });
+  await api('setMyDescription', { description: 'What it costs to send USDT, BTC, ETH, SOL and more right now on Tron, Ethereum, Solana and every major network, plus the cheapest exchange to withdraw from. Updated every 15 minutes. Free.\n\nتكلفة إرسال USDT وBTC وETH وSOL وغيرها الآن على Tron وEthereum وSolana وكل الشبكات الرئيسية، وأرخص منصة للسحب. يتحدث كل 15 دقيقة. مجاني.\n\nTap the menu button for live fees · اضغط زر القائمة للرسوم الآن\nA Gulf Arcade project' });
+  await api('setMyShortDescription', { short_description: 'Live crypto transfer fees & cheapest exchange · رسوم التحويل الآن وأرخص منصة للسحب · crypto.gulfarcade.com' });
   await api('setChatMenuButton', { menu_button: { type: 'web_app', text: 'Live fees · الرسوم', web_app: { url: SITE + '/ar/' } } });
   console.log('telegram: bot profile set');
 } else if (mode === 'digest' || mode === 'auto') {
