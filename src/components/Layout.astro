@@ -46,6 +46,14 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; min-height: 64px; padding-block: 10px; }
   .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; color: var(--fg); margin-inline-end: auto; font-size: 17px; }
   .brand .mark { width: 32px; height: 32px; border-radius: 9px; flex: none; display: block; }
+  .tools { display: flex; align-items: center; flex: none; }
+  .brand { flex: 1 1 0; min-width: 0; }   /* basis 0: the name never forces the buttons onto a new line; it grows into the space left */ .brand > span { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Telegram channel button, left of the language menu */
+  .tg { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; border: 1px solid var(--box); background: var(--card); color: var(--accent-text); margin-inline-end: 8px; transition: border-color .15s, background .15s; }
+  .tg:hover { border-color: var(--accent); background: var(--tint); }
+  .tg svg { width: 19px; height: 19px; }
+  @media (max-width: 640px) { .tg { width: 34px; height: 34px; margin-inline-end: 6px; } }
+  header.top.scrolled .tg { width: 30px; height: 30px; } header.top.scrolled .tg svg { width: 16px; height: 16px; }
   /* Language menu: globe + current language, opens a two-item list */
   .lmenu { position: relative; }
   .lmenu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 10px 0 9px; border: 1px solid var(--box); border-radius: 999px; background: var(--card); color: var(--fg-2); font-size: 13.5px; font-weight: 600; }
@@ -75,7 +83,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .totop:hover { background: color-mix(in srgb, var(--accent) 85%, #000); }
   .totop svg { width: 20px; height: 20px; }
   @media (prefers-reduced-motion: reduce) { nav.main, .totop { transition: none; } }
-  @media (max-width: 360px) { nav.main a { font-size: 12px; padding-inline: 2px; } .brand { font-size: 14px; } }   /* very small phones: keep all six labels whole */
+  @media (max-width: 360px) { nav.main a { font-size: 12px; padding-inline: 2px; } .brand { font-size: 12.5px; } }   /* very small phones: keep all six labels whole */
   nav.main a { padding: 7px 12px; border-radius: 10px; text-decoration: none; color: var(--fg-2); font-size: 14.5px; font-weight: 500; }
   nav.main a:hover { background: var(--tint); color: var(--fg); }
   nav.main a[aria-current="page"] { background: var(--fg); color: var(--bg); }
@@ -173,7 +181,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
     header.top .wrap { min-height: 56px; padding-block: 8px; gap: 6px 12px; }
     .lmenu > summary { min-height: 34px; padding: 0 8px; } .lmenu > summary span { display: none; }   /* phones: globe + arrow only, stays on the logo row */
     .lmenu ul { inset-inline-start: auto; inset-inline-end: 0; }   /* phones: the list hangs from the button's inner edge, away from the screen edge */
-    .brand { font-size: 15px; }
+    .brand { font-size: 13.5px; gap: 8px; }
     nav.main { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: 100%; }
     nav.main a { padding: 7px 4px; font-size: 13px; white-space: nowrap; text-align: center; border: 1px solid var(--box); background: var(--card); overflow: hidden; text-overflow: ellipsis; }
     main { padding-block: 18px 40px; }
@@ -199,9 +207,12 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href={L('/')}><img class="mark" src="/logo-32.png" srcset="/logo-32.webp 1x, /logo-64.webp 2x" alt="" width="32" height="32"><span>{t(lang, 'site.name')}</span></a>
+  <div class="tools">
+  <a class="tg" href="https://t.me/cryptofeeindex" rel="nofollow noopener" target="_blank" aria-label={t(lang, 'nav.telegram')} title={t(lang, 'nav.telegram')}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.7 3.3 2.9 10.6c-1.1.4-1.1 1.1-.2 1.4l4.7 1.5 1.8 5.6c.2.6.4.8.8.8.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.2-15c.3-1.3-.5-1.9-1.3-1.6ZM8 13.1l9.8-6.2c.5-.3.9-.1.6.2l-8 7.2-.3 3.3L8 13.1Z"/></svg></a>
   <details class="lmenu"><summary aria-label={t(lang, 'lang.label')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c3 3.2 3 15.8 0 19M12 2.5c-3 3.2-3 15.8 0 19"/></svg><span>{LANG_NAMES[lang]}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
     <ul role="list">{LANGS.map((l) => <li><a href={langPath(l)} hreflang={l} lang={l} aria-current={l === lang ? 'page' : undefined}>{LANG_NAMES[l]}</a></li>)}</ul>
   </details>
+  </div>
   <nav class="main" aria-label={t(lang, 'nav.aria')}>{NAV.map(([p, k]) => <a href={L(p)} class={k === 'nav.embed' ? 'hl' : undefined} aria-current={path === L(p) ? 'page' : undefined}>{t(lang, k)}</a>)}</nav>
 </div></header>
 <div class="header-spacer" aria-hidden="true"></div>
