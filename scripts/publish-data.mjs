@@ -10,15 +10,16 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const LOGO = 'data:image/png;base64,' + fs.readFileSync('public/logo-192.png').toString('base64');
 const svg = (big, small, foot) => `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#0b0f17"/><rect x="0" y="0" width="14" height="630" fill="#2dd4bf"/>
 <image href="${LOGO}" x="70" y="70" width="72" height="72"/><text x="162" y="120" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#8b98a8" font-weight="600">Crypto Fee &amp; Transfer Index</text>
-<text x="70" y="290" font-family="Helvetica, Arial, sans-serif" font-size="${big.length > 30 ? 60 : 76}" fill="#e6edf7" font-weight="800">${esc(big)}</text>
-<text x="70" y="380" font-family="Helvetica, Arial, sans-serif" font-size="40" fill="#2dd4bf" font-weight="700">${esc(small)}</text>
+<text x="70" y="290" font-family="Helvetica, Arial, sans-serif" font-size="${big.length > 40 ? 48 : big.length > 30 ? 60 : 76}" fill="#e6edf7" font-weight="800">${esc(big)}</text>
+<text x="70" y="380" font-family="Helvetica, Arial, sans-serif" font-size="${small.length > 60 ? 26 : small.length > 45 ? 32 : 40}" fill="#2dd4bf" font-weight="700">${esc(small)}</text>
 <text x="70" y="560" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#8b98a8">${esc(foot)}</text></svg>`;
 const when = F.generated_at.slice(0, 16).replace('T', ' ') + ' UTC';
 const cheapest = (a) => Object.values(a.networks).filter((n) => n.fee_usd != null).sort((x, y) => x.fee_usd - y.fee_usd)[0];
 const T = JSON.parse(fs.readFileSync('locales/en.json', 'utf8')); // share-image wording (English for now; Arabic images come with the /ar/ phase)
 const tt = (k, v) => T[k].replace(/\{(\w+)\}/g, (_, n) => v[n]);
 const jobs = [];
-jobs.push(['default', svg(T['site.name'], T['site.tagline'], `crypto.gulfarcade.com · ${when}`)]);
+jobs.push(['default', svg(T['site.name'], T['og.default_small'], `crypto.gulfarcade.com · ${when}`)]);
+jobs.push(['calc', svg(T['calc.title'], T['og.calc_small'], `crypto.gulfarcade.com · ${when}`)]);
 for (const a of Object.values(F.assets)) { const b = cheapest(a); jobs.push([a.id, svg(tt('og.cost', { asset: a.symbol }), b ? tt('og.cheapest', { network: b.name, fee: usd(b.fee_usd) }) : '', `crypto.gulfarcade.com · ${when}`)]); }
 const D = Object.values(F.assets).find((a) => a.default);
 const seen = new Set();

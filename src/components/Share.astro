@@ -1,0 +1,34 @@
+---
+// Share row: WhatsApp, Telegram, X, Facebook and a copy-link button, each in the network's own colours.
+// Opens the network's share page in a new tab; the copy button uses the clipboard and says "Link copied" for two seconds.
+import { t, SITE_URL } from '../data';
+interface Props { lang: string; path: string; text: string }
+const { lang, path, text } = Astro.props;
+const url = `${SITE_URL}${path}`, u = encodeURIComponent(url), x = encodeURIComponent(text);
+const nets = [
+  { id: 'whatsapp', name: 'WhatsApp', href: `https://wa.me/?text=${x}%20${u}`, color: '#25D366', icon: 'M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m0 1.67c4.54 0 8.23 3.7 8.23 8.24 0 4.54-3.69 8.23-8.23 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.24-8.24M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.86-.87 2.07 0 1.22.89 2.39 1 2.56.14.17 1.76 2.67 4.25 3.73.59.27 1.05.42 1.41.53.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.16-.48-.27-.25-.14-1.47-.74-1.69-.82-.23-.08-.37-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.11-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01' },
+  { id: 'telegram', name: 'Telegram', href: `https://t.me/share/url?url=${u}&text=${x}`, color: '#2AABEE', icon: 'M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z' },
+  { id: 'x', name: 'X', href: `https://twitter.com/intent/tweet?url=${u}&text=${x}`, color: '#000000', icon: 'M17.53 3h3.07l-6.71 7.67L21.78 21h-6.18l-4.84-6.33L5.22 21H2.15l7.18-8.2L1.77 3h6.34l4.37 5.78L17.53 3zm-1.08 16.17h1.7L7.12 4.74H5.3l11.15 14.43z' },
+  { id: 'facebook', name: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, color: '#1877F2', icon: 'M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z' },
+];
+---
+<div class="share" role="group" aria-label={t(lang, 'share.label')}>
+  {nets.map((n) => <a class="share-btn" href={n.href} target="_blank" rel="noopener nofollow" aria-label={`${t(lang, 'share.label')} · ${n.name}`} title={n.name} style={`--c:${n.color}`}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={n.icon}/></svg></a>)}
+  <button type="button" class="share-btn share-copy" data-url={url} data-label={t(lang, 'share.copy')} data-done={t(lang, 'share.copied')} aria-label={t(lang, 'share.copy')} title={t(lang, 'share.copy')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.1-.1l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg><span class="share-toast" aria-live="polite"></span></button>
+</div>
+<script is:inline>
+  document.querySelectorAll('.share-copy').forEach(function (b) { b.addEventListener('click', function () {
+    var done = function () { var s = b.querySelector('.share-toast'); s.textContent = b.dataset.done; b.classList.add('done'); setTimeout(function () { s.textContent = ''; b.classList.remove('done'); }, 2000); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(b.dataset.url).then(done, done); else done();
+  }); });
+</script>
+<style is:global>
+  .share { display: inline-flex; align-items: center; gap: 8px; margin-inline-start: auto; }   /* when it wraps under the title on phones it stays at the end of the line */
+  .share-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--box); background: var(--card); color: var(--c, var(--fg-2)); cursor: pointer; padding: 0; transition: transform .15s, background .15s, color .15s, border-color .15s; }
+  .share-btn:hover { background: var(--c, var(--accent)); color: #fff; border-color: var(--c, var(--accent)); transform: translateY(-1px); }
+  .share-btn svg { width: 18px; height: 18px; }
+  .share-copy { color: var(--accent-text); } .share-copy.done { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .share-toast { position: absolute; top: calc(100% + 6px); inset-inline-end: 0; white-space: nowrap; font: 600 12px/1 inherit; font-family: inherit; color: var(--accent-text); }
+  @media (prefers-color-scheme: dark) { .share-btn[style*="#000000"] { --c: #e6edf7; } }
+  @media (max-width: 640px) { .share-btn { width: 32px; height: 32px; } .share-btn svg { width: 16px; height: 16px; } }
+</style>

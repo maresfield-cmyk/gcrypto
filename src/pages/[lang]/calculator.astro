@@ -1,5 +1,6 @@
 ---
 import Layout from '../../components/Layout.astro';
+import Share from '../../components/Share.astro';
 import { LANGS, t, fees, exchanges, assetList } from '../../data';
 export const getStaticPaths = () => LANGS.map((lang) => ({ params: { lang } }));
 const { lang } = Astro.params;
@@ -13,8 +14,8 @@ const data = {
 };
 const S = Object.fromEntries(['calc.fee', 'calc.share', 'calc.time', 'calc.alt', 'calc.alt_wallet', 'calc.min', 'calc.below_min', 'calc.not_offered', 'minutes', 'calc.own_wallet'].map((k) => [k, t(lang, k)]));
 ---
-<Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.description')} path={L('/calculator/')} updated={F.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
-  <div class="hero"><p class="eyebrow">{t(lang, 'nav.calculator')}</p><h1>{t(lang, 'calc.title')}</h1><p class="lead">{t(lang, 'calc.intro')}</p></div>
+<Layout lang={lang} title={t(lang, 'calc.title')} description={t(lang, 'calc.description')} path={L('/calculator/')} og="/og/calc.png" updated={F.generated_at} crumbs={[{ name: t(lang, 'calc.title'), path: L('/calculator/') }]}>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.calculator')}</p><div class="h1row"><h1>{t(lang, 'calc.title')}</h1><Share lang={lang} path={L('/calculator/')} text={t(lang, 'share.text')} /></div><p class="lead">{t(lang, 'calc.intro')}</p></div>
   <form id="calc" class="card" style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end">
     <label>{t(lang, 'calc.amount')} (USD)<br><input id="amount" type="number" min="1" value="100" style="width:100%"></label>
     <label>{t(lang, 'calc.asset')}<br><select id="asset" style="width:100%">{assets.map((a) => <option value={a.symbol}>{a.symbol} · {a.name}</option>)}</select></label>
