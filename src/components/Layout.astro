@@ -1,7 +1,8 @@
 ---
 // Page shell: header nav, footer, dark mode, logical CSS (RTL-ready), structured data, client-side refresh of live numbers.
 import '@fontsource-variable/inter';
-import '@fontsource-variable/noto-sans-arabic';
+import '@fontsource/noto-sans-arabic/arabic-400.css';   // Arabic glyphs only (two static weights, ~50 KB each); Latin stays on Inter
+import '@fontsource/noto-sans-arabic/arabic-700.css';
 import { t, dir, LANGS, LANG_NAMES, SITE_URL, fmtTime } from '../data';
 interface Props { lang: string; title: string; description: string; path: string; og?: string; updated?: string; crumbs?: { name: string; path: string }[]; jsonld?: object[] }
 const { lang, title, description, path, og, updated, crumbs = [], jsonld = [] } = Astro.props;
@@ -65,7 +66,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .lmenu ul a { display: block; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--fg); font-weight: 500; }
   .lmenu ul a:hover, .lmenu ul a[aria-current="page"] { background: var(--tint); }
   /* Arabic: Noto Sans Arabic, no letter-spacing (it breaks the joined script), numbers kept left-to-right */
-  html[lang="ar"] body { font-family: 'Noto Sans Arabic Variable', 'Inter Variable', system-ui, sans-serif; }
+  html[lang="ar"] body { font-family: 'Inter Variable', 'Noto Sans Arabic', system-ui, sans-serif; }   /* Inter for Latin and digits, Noto for Arabic */
   html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] .fee, html[lang="ar"] .brand, html[lang="ar"] .card .name, html[lang="ar"] .pill, html[lang="ar"] .eyebrow { letter-spacing: 0; }
   html[lang="ar"] h1 { line-height: 1.35; } html[lang="ar"] p, html[lang="ar"] li, html[lang="ar"] td, html[lang="ar"] th { line-height: 1.75; }
   [dir="rtl"] .num, [dir="rtl"] .fee, [dir="rtl"] td.num, [dir="rtl"] .sub.num, [dir="rtl"] code, [dir="rtl"] pre, [dir="rtl"] textarea.code { direction: ltr; unicode-bidi: isolate; }
@@ -90,7 +91,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   /* Free embed: a green-bordered pill so it stands out from the rest of the menu */
   nav.main a.hl { border: 1.5px solid var(--accent); border-radius: 999px; color: var(--accent-text); font-weight: 600; padding-block: 6px; }
   nav.main a.hl:hover { background: var(--tint); color: var(--accent-text); }
-  nav.main a.hl[aria-current="page"] { background: var(--accent); color: #fff; }
+  nav.main a.hl[aria-current="page"] { background: var(--accent-text); color: #fff; border-color: var(--accent-text); }
   main { padding-block: 20px 44px; }
   .h1row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 0 0 10px; } .h1row h1 { margin: 0; }
   h1 { font-size: clamp(30px, 4.6vw, 44px); line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.025em; font-weight: 700; }
@@ -153,6 +154,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   /* The code itself always reads left-to-right, so on Arabic pages the button stays at the physical right, where the code ends */
   [dir="rtl"] .copy { inset-inline-end: auto; inset-inline-start: 10px; }
   code, pre, textarea.code { font-family: var(--mono); font-size: 13px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
   pre, textarea.code { background: var(--card); border: 1px solid var(--box); border-radius: 12px; padding: 14px; overflow: auto; width: 100%; direction: ltr; text-align: left; color: var(--fg-2); }
   button, select, input { font: inherit; }
   input, select { background: var(--bg-2); color: var(--fg); border: 1px solid var(--line-2); border-radius: 10px; min-height: 42px; padding: 0 12px; }
@@ -176,7 +178,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
   .facts .chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--tint); border: 1px solid var(--box); font-size: 13px; }
   .facts .chip small { color: var(--muted); font-size: 12px; }
   @media (max-width: 640px) { .facts { padding: 2px 13px; } .facts .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
-  dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; font-size: 14.5px; } dl.kv dt { color: var(--muted); min-width: 0; } dl.kv dd { margin: 0; text-align: end; white-space: nowrap; }
+  dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; margin: 0; font-size: 14.5px; } dl.kv dt { color: var(--muted); min-width: 0; } dl.kv dd { margin: 0; text-align: end; overflow-wrap: anywhere; } dl.kv dd.num, dl.kv.num dd:has(> span.num) { white-space: nowrap; }
   /* Phones: two cards per row, tighter spacing, the six navigation links as a 3-column grid (no scrolling) */
   @media (max-width: 640px) {
     header.top .wrap { min-height: 56px; padding-block: 8px; gap: 6px 12px; }

@@ -51,6 +51,8 @@ for (const [ex, f] of Object.entries(facts)) {
       rec.rows.push(row);
     }
   }
+  const NAMES = JSON.parse(fs.readFileSync('config/network-map.json', 'utf8')).display_names || {};
+  for (const r of rec.rows) if (!r.network_name && NAMES[r.network]) r.network_name = NAMES[r.network];   // readable name for networks the index does not track
   rec.rows = dedupe(rec.rows);
   for (const r of rec.rows) { r.fee_usd = r.fee == null || priceOf(r.fee_asset) == null ? null : r.fee * priceOf(r.fee_asset); if (r.fee_usd != null && r.fee_usd > CAP_USD) r.flags.push('fee_above_cap'); }
   out.exchanges[ex] = rec;

@@ -33,7 +33,7 @@ const skip = new Set(['note', 'estimation_wallet']);
   {rows.length ? <Chart lang={lang} rows={rows} days={7} title={t(lang, 'net.chart7')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}
   <h2>{t(lang, 'net.chart30')} · {main.symbol}</h2>
   {rows.length ? <Chart lang={lang} rows={rows} days={30} title={t(lang, 'net.chart30')} /> : <p class="meta">{t(lang, 'net.no_history', { date: fmtDate(lang, F.generated_at) })}</p>}
-  {offers.length > 0 && <div><h2>{t(lang, 'net.exchanges', { network: N.name })} · {main.symbol}</h2>
+  {offers.length > 0 && <div><h2>{t(lang, 'net.exchanges', { network: N.name, asset: main.symbol })} · {main.symbol}</h2>
     <div class="tbl"><table><thead><tr><th>{t(lang, 'compare.exchange')}</th><th class="num">{t(lang, 'ex.fee')}</th><th class="num">{t(lang, 'ex.min')}</th><th>{t(lang, 'ex.status')}</th></tr></thead><tbody>
       {offers.map((o, i) => <tr><td><a href={L(`/exchanges/${o.id}/`)}>{o.name}</a></td><td class={'num' + (i === 0 ? ' best' : '')}>{fmtNum(lang, o.cell.fee)} {main.symbol}</td><td class="num">{o.cell.min != null ? fmtNum(lang, o.cell.min) : '–'}</td><td><span class={'pill ' + (o.cell.enabled ? 'good' : 'bad')}>{t(lang, o.cell.enabled ? 'ex.open' : 'ex.closed')}</span></td></tr>)}
     </tbody></table></div></div>}
