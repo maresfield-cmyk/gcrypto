@@ -27,20 +27,23 @@ const nets = Object.values(A.networks).filter((n) => n.fee_usd != null).sort((a,
 const routes = Object.entries(M.assets.usdt.exchanges).flatMap(([ex, e]) => Object.entries(e.cells).filter(([, c]) => c && c.enabled && c.fee_usd != null && !c.flags?.length).map(([n, c]) => ({ ex: e.name, net: F.networks[n]?.name ?? n, fee: c.fee, fee_usd: c.fee_usd }))).sort((a, b) => a.fee_usd - b.fee_usd);
 
 function digestText() {
-  const top = nets.slice(0, 3), tron = A.networks.tron, btc = B?.networks?.bitcoin, best = routes[0];
+  // The three cheapest networks, then Tron (the most used network for USDT) as an unnumbered comparison line,
+  // left out when Tron is already one of the three.
+  const top = nets.slice(0, 3), btc = B?.networks?.bitcoin, best = routes[0];
+  const tron = top.includes(A.networks.tron) ? null : A.networks.tron;
   const when = new Date(F.generated_at).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
   // Arabic first, then English. The Arabic lines are placeholder wording for the translators to check.
   const ar = [
     `<b>رسوم إرسال USDT اليوم</b>`,
     ...top.map((n, i) => `${i + 1}. ${esc(n.name)}: <b>${usd(n.fee_usd)}</b>`),
-    tron ? `Tron (TRC-20): <b>${usd(tron.fee_usd)}</b>` : null,
+    tron ? `للمقارنة، Tron (TRC-20): <b>${usd(tron.fee_usd)}</b>` : null,
     best ? `أرخص سحب من منصة: ${esc(best.ex)} عبر ${esc(best.net)} بـ <b>${best.fee} USDT</b>` : null,
     btc ? `رسوم تحويل BTC: <b>${usd(btc.fee_usd)}</b>` : null,
   ].filter(Boolean).join('\n');
   const en = [
     `<b>Cost to send USDT today</b>`,
     ...top.map((n, i) => `${i + 1}. ${esc(n.name)}: <b>${usd(n.fee_usd)}</b>`),
-    tron ? `Tron (TRC-20): <b>${usd(tron.fee_usd)}</b>` : null,
+    tron ? `For comparison, Tron (TRC-20): <b>${usd(tron.fee_usd)}</b>` : null,
     best ? `Cheapest exchange withdrawal: ${esc(best.ex)} via ${esc(best.net)} at <b>${best.fee} USDT</b>` : null,
     btc ? `BTC transfer fee: <b>${usd(btc.fee_usd)}</b>` : null,
   ].filter(Boolean).join('\n');
