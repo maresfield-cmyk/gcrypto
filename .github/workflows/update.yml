@@ -74,4 +74,10 @@ jobs:
           # GitHub's schedule fires this repo only every 1-6 h, so each run starts the next at 4/19/34/49 past the hour.
           # The concurrency group keeps one run going and at most one waiting, so the chain cannot multiply; cron restarts it if it stops.
           now=$(date -u +%s); slot=$(( (now - 240) / 900 * 900 + 900 + 240 )); sleep $(( slot - now ))
-          gh workflow run update.yml --repo "$GITHUB_REPOSITORY" -f mode=auto -f chain=true
+          # GitHub's API sometimes answers the dispatch with a 500 (28 Oct: the chain stopped for 3 h 40 min until cron
+          # restarted it), so retry a few times before giving up.
+          for i in 1 2 3 4 5; do
+            gh workflow run update.yml --repo "$GITHUB_REPOSITORY" -f mode=auto -f chain=true && exit 0
+            echo "dispatch failed (try $i of 5), retrying in 30 s"; sleep 30
+          done
+          exit 1
