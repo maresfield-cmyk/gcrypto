@@ -1,7 +1,8 @@
 // Layer 2 run: withdrawal fees and minimums for USDT and BTC from every exchange (API where possible, the manual sheet
 // otherwise), network names normalised, validated, written to data/out/exchanges.json and data/out/usdt-matrix.json.
 // An exchange without a key or with a failing API keeps its previous rows (marked stale); unmapped names go to
-// data/out/unmapped.json and the alert list. Manual rows older than 14 days are flagged.
+// data/out/unmapped.json and the alert list. Manual rows older than 14 days are marked check_overdue and alert, and stay in the rankings.
+// fee_source 'page' (Crypto.com): the sheet's rows are refreshed from the fee page; if that fails they keep the last good values.
 import fs from 'node:fs';
 import YAML from 'yaml';
 import { kucoin } from '../src/fetch/exchanges/kucoin.mjs';
@@ -9,6 +10,7 @@ import { bitget } from '../src/fetch/exchanges/bitget.mjs';
 import { binance } from '../src/fetch/exchanges/binance.mjs';
 import { bybit } from '../src/fetch/exchanges/bybit.mjs';
 import { okx } from '../src/fetch/exchanges/okx.mjs';
+import { cryptocomPage } from '../src/fetch/exchanges/cryptocom-page.mjs';
 import { unmapped, NETWORK_IDS } from '../src/lib/normalise.mjs';
 if (fs.existsSync('.env')) for (const l of fs.readFileSync('.env', 'utf8').split('\n')) { const m = l.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; }
 const ASSET_CFG = JSON.parse(fs.readFileSync('config/assets.json')).assets;
@@ -20,13 +22,14 @@ const FEES = JSON.parse(fs.readFileSync('data/out/fees.json')), prices = FEES.pr
 const priceOf = (sym) => { const a = ASSET_CFG.find((x) => x.symbol === sym); return a ? prices[a.coingecko] ?? null : null; };
 const alerts = [], out = { generated_at: now, exchanges: {}, alerts };
 const API = { kucoin, bitget, binance, bybit, okx };
+const PAGE = { cryptocom: cryptocomPage };
 // manual sheet
 const csv = fs.readFileSync('data/manual/fees-manual.csv', 'utf8').trim().split('\n');
 const head = csv[0].split(',');
 const manual = csv.slice(1).map((l) => { const c = l.match(/("[^"]*"|[^,]*)(,|$)/g).map((x) => x.replace(/,$/, '').replace(/^"|"$/g, '')); return Object.fromEntries(head.map((h, i) => [h, c[i] ?? ''])); });
 for (const [ex, f] of Object.entries(facts)) {
   const rec = { id: ex, name: f.name, website: f.website, fee_source: f.fee_source, fee_page: f.fee_page, facts: { gulf_licensing: f.gulf_licensing, deposit_currencies: f.deposit_currencies, deposits: f.deposits || [], funding_source: f.funding_source || null, p2p: f.p2p, last_verified: f.last_verified || null }, rows: [], observed_at: now, stale: false };
-  const viaApi = f.fee_source === 'api' || f.fee_source === 'api+manual' || (ex === 'cryptocom' && process.env.CRYPTOCOM_API_KEY);
+  const viaApi = f.fee_source === 'api' || f.fee_source === 'api+manual';
   if (viaApi) {
     try {
       const rows = await API[ex](ASSETS);
@@ -40,14 +43,20 @@ for (const [ex, f] of Object.entries(facts)) {
   // Manual rows: the whole sheet for manual exchanges; for 'api+manual' only the asset/network cells the API did not return
   // (e.g. Bybit: our key is on the EU entity, whose list is shorter than what bybit.com offers Gulf users).
   if (!viaApi || f.fee_source === 'api+manual') {
-    for (const m of manual.filter((r) => r.exchange === ex)) {
-      if (viaApi && rec.rows.some((r) => r.asset === m.asset && r.network === m.network)) continue;
+    let live = null;
+    if (f.fee_source === 'page') { try { live = await PAGE[ex](); } catch (e) { alerts.push({ exchange: ex, type: 'source_failed', detail: e.message, at: now }); } }
+    for (const sheet of manual.filter((r) => r.exchange === ex)) {
+      if (viaApi && rec.rows.some((r) => r.asset === sheet.asset && r.network === sheet.network)) continue;
+      const same = (r) => r.asset === sheet.asset && r.network === sheet.network;
+      const got = live?.find(same), old = prev.exchanges[ex]?.rows?.find(same);
+      const m = got ? { ...sheet, fee: String(got.fee), withdraw_enabled: String(got.withdraw_enabled), last_verified: now.slice(0, 10) }
+        : old?.fee != null && old.last_verified > sheet.last_verified ? { ...sheet, fee: String(old.fee), withdraw_enabled: String(old.withdraw_enabled), last_verified: old.last_verified } : sheet;
       const row = { exchange: ex, asset: m.asset, network: m.network, network_raw: m.network, fee: m.fee === '' || m.fee === 'network' ? null : +m.fee, pass_through: m.fee === 'network', fee_asset: m.fee_asset || m.asset, min: m.min === '' ? null : +m.min, withdraw_enabled: m.withdraw_enabled !== 'false', manual: true, last_verified: m.last_verified || null, source: m.source_url, notes: m.notes, observed_at: m.last_verified || null, flags: [] };
       if (!NETWORK_IDS.includes(row.network)) { unmapped.push({ exchange: ex, name: m.network }); continue; }
       if (row.fee == null && !row.pass_through) row.flags.push('not_filled_in');   // fee 'network' in the sheet = the exchange passes the live network fee through (no fixed figure)
       else row.flags.push(...validate(row));
       if (!row.last_verified) row.flags.push('never_verified');
-      else if (Date.now() - Date.parse(row.last_verified) > 14 * 86400e3) { row.flags.push('manual_row_older_than_14d'); alerts.push({ exchange: ex, type: 'manual_stale', detail: `${m.asset} ${m.network} last verified ${m.last_verified}`, at: now }); }
+      else if (Date.now() - Date.parse(row.last_verified) > 14 * 86400e3) { row.check_overdue = true; alerts.push({ exchange: ex, type: 'manual_stale', detail: `${m.asset} ${m.network} last verified ${m.last_verified}`, at: now }); }
       rec.rows.push(row);
     }
   }
@@ -68,7 +77,7 @@ for (const a of ASSET_CFG) {
   const nets = Object.keys(a.on);
   const m = { symbol: a.symbol, name: a.name, networks: nets, exchanges: {} };
   for (const [ex, rec] of Object.entries(out.exchanges)) {
-    m.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(nets.map((n) => { const r = rec.rows.find((x) => x.asset === a.symbol && x.network === n); return [n, r ? { fee: r.fee, fee_usd: r.fee_usd, min: r.min, pass_through: !!r.pass_through, enabled: r.withdraw_enabled, flags: r.flags, last_verified: r.last_verified || r.observed_at } : null]; })) };
+    m.exchanges[ex] = { name: rec.name, stale: rec.stale, note: rec.note || rec.stale_reason || null, fee_source: rec.fee_source, cells: Object.fromEntries(nets.map((n) => { const r = rec.rows.find((x) => x.asset === a.symbol && x.network === n); return [n, r ? { fee: r.fee, fee_usd: r.fee_usd, min: r.min, pass_through: !!r.pass_through, enabled: r.withdraw_enabled, flags: r.flags, check_overdue: !!r.check_overdue, last_verified: r.last_verified || r.observed_at } : null]; })) };
   }
   m.cheapest_per_network = Object.fromEntries(nets.map((n) => { const c = Object.entries(m.exchanges).map(([ex, e]) => [ex, e.cells[n]]).filter(([, v]) => v && v.enabled && v.fee != null && !v.flags.length).sort((x, y) => x[1].fee - y[1].fee); return [n, c.length ? { exchange: c[0][0], fee: c[0][1].fee, fee_usd: c[0][1].fee_usd } : null]; }));
   matrix.assets[a.id] = m;

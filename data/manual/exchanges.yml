@@ -120,7 +120,7 @@ exchanges:
   cryptocom:
     name: Crypto.com
     website: https://crypto.com
-    fee_source: manual        # switches to api if CRYPTOCOM_API_KEY is set
+    fee_source: page          # read from fee_page by src/fetch/exchanges/cryptocom-page.mjs; the sheet's rows say which cells, and are the fallback
     fee_page: https://crypto.com/eea/fees-limits   # the App's fee page; the Exchange (crypto.com/exchange) is a separate product
     gulf_licensing:
       - { region: "Dubai (VARA)", status: "VASP licence, active since 2024-04-03 (VL/23/10/003): exchange, broker-dealer, lending, management; retail allowed", entity: "Foris DAX Middle East FZE", region_ar: "دبي (VARA)", status_ar: "رخصة VASP سارية منذ 2024-04-03 (VL/23/10/003): تداول، وساطة، إقراض، إدارة؛ مسموح للأفراد", source: "https://www.vara.ae/en/licenses-and-register/public-register/foris-dax-middle-east-fze-cryptocom/", last_verified: "2026-10-20", verified: true }

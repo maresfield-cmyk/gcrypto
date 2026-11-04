@@ -5,7 +5,9 @@ import { rpc, rawRef, hexNum } from '../lib/http.mjs';
 export async function evm(net, asset, on) {
   const src = `evm-${net.id}-${asset.id}`;
   const fh = await rpc(`evm-${net.id}-feehistory`, net.rpc, 'eth_feeHistory', ['0x5', 'latest', [50, 90]]);
-  const base = hexNum(fh.baseFeePerGas.at(-1)), tip = fh.reward && fh.reward.length ? hexNum(fh.reward.at(-1)[0]) : 0, tip90 = fh.reward && fh.reward.length ? hexNum(fh.reward.at(-1)[1]) : tip;
+  // tips: the median across the 5 blocks, because one block's tip can be 10x the usual fee on a quiet network (4 Nov: Ethereum, base 0.08 gwei, single blocks at 1-2 gwei)
+  const midTip = (i) => { const t = (fh.reward || []).map((r) => hexNum(r[i])).sort((a, b) => a - b); return t.length ? t[Math.floor(t.length / 2)] : 0; };
+  const base = hexNum(fh.baseFeePerGas.at(-1)), tip = midTip(0), tip90 = midTip(1);
   let gasPrice = base + tip, gasPriceSrc = 'eth_feeHistory base + p50 tip';
   if (net.id === 'arbitrum' || gasPrice === 0) { gasPrice = hexNum(await rpc(`evm-${net.id}-gasprice`, net.rpc, 'eth_gasPrice')); gasPriceSrc = 'eth_gasPrice'; }
   let gas, gasNew = null, gasSrc, flags = [];

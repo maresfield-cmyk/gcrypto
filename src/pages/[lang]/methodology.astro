@@ -23,7 +23,7 @@ const ext = { rel: 'nofollow noopener', target: '_blank' };
   <p>{t(lang, 'method.usd_text')}</p>
   <h2>{t(lang, 'method.exchanges_h2')}</h2>
   <div class="tbl"><table><thead><tr><th>{t(lang, 'method.col_exchange')}</th><th>{t(lang, 'method.col_method')}</th><th>{t(lang, 'method.col_source')}</th></tr></thead><tbody>
-    {Object.entries(E.exchanges).map(([id, e]: any) => <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a></td><td>{t(lang, e.fee_source === 'api' ? 'method.api_method' : 'method.manual_method')}</td><td><a href={e.fee_page} {...ext}>{e.name} {t(lang, 'method.fee_page')}</a></td></tr>)}
+    {Object.entries(E.exchanges).map(([id, e]: any) => <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a></td><td>{t(lang, e.fee_source === 'api' ? 'method.api_method' : e.fee_source === 'page' ? 'method.page_method' : 'method.manual_method')}</td><td><a href={e.fee_page} {...ext}>{e.name} {t(lang, 'method.fee_page')}</a></td></tr>)}
   </tbody></table></div>
   <h2>{t(lang, 'method.validation_h2')}</h2>
   <ul>{[1, 2, 3, 4].map((i) => <li>{t(lang, `method.validation_${i}`)}</li>)}</ul>
