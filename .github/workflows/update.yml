@@ -55,8 +55,9 @@ jobs:
           git config user.name "gcrypto-bot" && git config user.email "bot@users.noreply.github.com"
           git add data/history data/out data/raw/*/latest.json 2>/dev/null || true
           git diff --cached --quiet || git commit -m "data: $(date -u +%FT%TZ) [skip ci]"
-          # a code push can land while this run is going: rebase onto it and retry instead of failing
-          for i in 1 2 3; do git push && break; git pull --rebase -X theirs origin main; done
+          # a code push can land while this run is going, or GitHub can answer a push with a 500 (4 Nov): rebase and retry instead of failing.
+          # --autostash because the run leaves changes it does not commit, which otherwise stop the pull and the retry with it
+          for i in 1 2 3; do git push && break; sleep 20; git pull --rebase --autostash -X theirs origin main; done
       - name: Upload site
         if: ${{ hashFiles('dist/index.html') != '' }}
         uses: actions/upload-pages-artifact@v3
