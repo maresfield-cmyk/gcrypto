@@ -7,23 +7,32 @@ for (const f of ['fees.json', 'matrix.json', 'exchanges.json']) if (fs.existsSyn
 const F = JSON.parse(fs.readFileSync('data/out/fees.json'));
 
 // ticker.json (Patrick, 6 Nov): the small feed behind the fee strip on the gulfarcade.com homepage. USDT and BTC only:
-// own-wallet network fee now and about 24 h ago per network, plus each exchange's withdrawal fee and minimum. pass = the
+// own-wallet network fee per network as [now, median about 24 h ago, median of the last 2 h], plus each exchange's withdrawal fee and minimum. pass = the
 // exchange has no fixed fee and passes the live network fee through. BTC on BNB Chain is a BEP-20 token, so its gas is
 // taken as USDT's on BNB Chain. Served with GitHub Pages' open CORS header so the homepage can read it.
 // Never allowed to stop this build: on any error the file is skipped (the strip then hides itself after 24 h).
 try {
   const M = JSON.parse(fs.readFileSync('data/out/matrix.json'));
   const spark = F.sparklines_7d || {};
-  const ago = (key) => { const s = spark[key]; if (!s?.length) return null; const t = Date.parse(F.generated_at) - 864e5;
-    let best = null; for (const [at, v] of s) { const d = Math.abs(Date.parse(at) - t); if (d < 2 * 36e5 && (!best || d < best.d)) best = { d, v }; } return best ? +best.v.toFixed(6) : null; };
-  const net = (asset, n, key = `${asset}:${n}`) => { const x = F.assets[asset]?.networks?.[n]; return x?.fee_usd == null ? null : [+x.fee_usd.toFixed(6), ago(key)]; };
+  // Trend points are medians of the readings around a moment (2 h either side 24 h ago; the last 2 h for now): Bitcoin's fee
+  // jumps between levels from one 15-minute reading to the next, and single readings made the strip's colour flip at random.
+  const med = (key, t, w) => { const v = (spark[key] || []).filter(([at]) => Math.abs(Date.parse(at) - t) <= w).map(([, x]) => +x).filter(Number.isFinite).sort((a, b) => a - b);
+    return v.length ? +((v[(v.length - 1) >> 1] + v[v.length >> 1]) / 2).toFixed(6) : null; };
+  const T0 = Date.parse(F.generated_at);
+  const ago = (key) => med(key, T0 - 864e5, 2 * 36e5), recent = (key) => med(key, T0 - 36e5, 36e5);
+  const net = (asset, n, key = `${asset}:${n}`) => { const x = F.assets[asset]?.networks?.[n]; return x?.fee_usd == null ? null : [+x.fee_usd.toFixed(6), ago(key), recent(key)]; };
   const wallet = { usdt: {}, btc: {} };
   for (const n of Object.keys(F.assets.usdt.networks)) { const v = net('usdt', n); if (v) wallet.usdt[n] = v; }
   if (net('btc', 'bitcoin')) wallet.btc.bitcoin = net('btc', 'bitcoin');
   if (wallet.usdt.bsc) wallet.btc.bsc = wallet.usdt.bsc;
-  const cells = (a) => Object.fromEntries(Object.entries(a?.cells || {}).filter(([, c]) => c && c.enabled && (c.fee != null || c.pass_through))
-    .map(([n, c]) => [n, { fee: c.pass_through ? null : c.fee, min: c.min, pass: !!c.pass_through }]));
-  const exchanges = Object.entries(M.assets.usdt.exchanges).map(([id, e]) => ({ id, name: e.name, usdt: cells(e), btc: cells(M.assets.btc.exchanges[id]) }));
+  // Flagged rows (not filled in, above the fee cap, never verified) are left out, as in the Telegram post. The fee is sent in
+  // the deposited coin: a manual row charged in another coin is converted through its dollar value.
+  const cells = (a, asset) => { const px = F.assets[asset].price_usd;
+    return Object.fromEntries(Object.entries(a?.cells || {}).filter(([, c]) => c && c.enabled && !c.flags?.length && (c.fee != null || c.pass_through))
+      .map(([n, c]) => { let fee = c.pass_through ? null : c.fee;
+        if (fee && c.fee_usd != null && Math.abs(c.fee_usd / fee / px - 1) > 0.2) fee = +(c.fee_usd / px).toPrecision(6);
+        return [n, { fee, min: c.min, pass: !!c.pass_through }]; })); };
+  const exchanges = Object.entries(M.assets.usdt.exchanges).map(([id, e]) => ({ id, name: e.name, usdt: cells(e, 'usdt'), btc: cells(M.assets.btc.exchanges[id], 'btc') }));
   const T = { generated_at: F.generated_at, exchanges_at: M.generated_at, price: { usdt: F.assets.usdt.price_usd, btc: F.assets.btc.price_usd }, wallet, exchanges };
   fs.writeFileSync('public/data/ticker.json', JSON.stringify(T));
 } catch (e) { console.error('ticker.json skipped:', e.message); }
