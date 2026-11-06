@@ -10,7 +10,8 @@ const F = JSON.parse(fs.readFileSync('data/out/fees.json'));
 // own-wallet network fee now and about 24 h ago per network, plus each exchange's withdrawal fee and minimum. pass = the
 // exchange has no fixed fee and passes the live network fee through. BTC on BNB Chain is a BEP-20 token, so its gas is
 // taken as USDT's on BNB Chain. Served with GitHub Pages' open CORS header so the homepage can read it.
-{
+// Never allowed to stop this build: on any error the file is skipped (the strip then hides itself after 24 h).
+try {
   const M = JSON.parse(fs.readFileSync('data/out/matrix.json'));
   const spark = F.sparklines_7d || {};
   const ago = (key) => { const s = spark[key]; if (!s?.length) return null; const t = Date.parse(F.generated_at) - 864e5;
@@ -25,7 +26,7 @@ const F = JSON.parse(fs.readFileSync('data/out/fees.json'));
   const exchanges = Object.entries(M.assets.usdt.exchanges).map(([id, e]) => ({ id, name: e.name, usdt: cells(e), btc: cells(M.assets.btc.exchanges[id]) }));
   const T = { generated_at: F.generated_at, exchanges_at: M.generated_at, price: { usdt: F.assets.usdt.price_usd, btc: F.assets.btc.price_usd }, wallet, exchanges };
   fs.writeFileSync('public/data/ticker.json', JSON.stringify(T));
-}
+} catch (e) { console.error('ticker.json skipped:', e.message); }
 const usd = (v) => new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: v < 0.01 ? 4 : v < 1 ? 3 : 2 }).format(v);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const LOGO = 'data:image/png;base64,' + fs.readFileSync('public/logo-192.png').toString('base64');
