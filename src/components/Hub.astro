@@ -3,13 +3,17 @@
 import Layout from './Layout.astro';
 import Sparkline from './Sparkline.astro';
 import AssetPicker from './AssetPicker.astro';
-import { t, fees, matrix, fmtUsd, fmtNum, fmtTime, fmtDate, cellsOf, cheapestOf, fmtPct } from '../data';
+import { t, fees, matrix, fmtUsd, fmtNum, fmtTime, fmtDate, cellsOf, cheapestOf, fmtPct, splitLink } from '../data';
 interface Props { lang: string; asset: string; path: string }
 const { lang, asset, path } = Astro.props;
 const F = fees(), M = matrix(), A = F.assets[asset], m = M.assets[asset];
 const sorted = cellsOf(F, asset), best = cheapestOf(F, asset);
 const L = (p: string) => `/${lang}${p}`;
-const combos = Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, min: c.min, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null, overdue: c.check_overdue, checked: c.last_verified }))).sort((a, b) => a.fee_usd - b.fee_usd).slice(0, 5);
+const combos = Object.entries(m.exchanges).flatMap(([ex, e]: any) => Object.entries(e.cells).filter(([, c]: any) => c && c.enabled && c.fee != null && c.fee_usd != null && !c.flags.length).map(([n, c]: any) => ({ ex: e.name, exId: ex, n, fee: c.fee, fee_usd: c.fee_usd, min: c.min, min_usd: c.min != null && A.price_usd ? c.min * A.price_usd : null, overdue: c.check_overdue, checked: c.last_verified }))).sort((a, b) => a.fee_usd - b.fee_usd);
+const routes = combos.splice(5);   // combos keeps the five cheapest; the rest only for the dearest route below
+// Patrick, 7 Nov 2026: a short unique paragraph: the cheapest and dearest exchange route, how often the data refreshes, the date, the methodology
+const dearest = routes.length ? routes[routes.length - 1] : combos[combos.length - 1];
+const [m1, m2] = splitLink(t(lang, 'g.method'));
 const AMTS = [100, 1000, 10000];
 const [h1a, h1b] = t(lang, 'hub.h1', { asset: '\u0000' }).split('\u0000');
 const btc = asset === 'btc' ? A.networks.bitcoin : null;
@@ -21,6 +25,7 @@ const showCases = sorted.filter((c) => c.cases_usd && Object.values(c.cases_usd)
     <h1 aria-label={t(lang, 'hub.h1', { asset: A.symbol })}>{h1a}<AssetPicker lang={lang} current={asset} base={path} />{h1b}</h1>
     <p class="lead">{t(lang, 'hub.intro', { asset: A.symbol })}</p>
     {best && <p class="best" style="font-size:17px">{t(lang, 'hub.cheapest_now', { network: best.name, fee: fmtUsd(lang, best.fee_usd) })}</p>}
+    {combos.length > 1 && <p class="lead">{t(lang, 'hub.g_exchange', { asset: A.symbol, exchange: combos[0].ex, network: F.networks[combos[0].n]?.name ?? combos[0].n, fee: fmtNum(lang, combos[0].fee), usd: fmtUsd(lang, combos[0].fee_usd), usd2: fmtUsd(lang, dearest.fee_usd) })} {t(lang, 'g.checked', { date: fmtDate(lang, F.generated_at) })} {m1}<a href={L('/methodology/')}>{t(lang, 'method.title')}</a>{m2}</p>}
   </div>
   <div class="grid" style={sorted.length >= 3 && sorted.length <= 8 ? `--n:${sorted.length}` : undefined}>
     {sorted.map((n, i) => <a class={'card' + (i === 0 ? ' rank-1' : '')} href={L(`/networks/${n.network}/`)} style="text-decoration:none;color:inherit">

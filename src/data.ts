@@ -43,3 +43,15 @@ export function fmtPct(lang: string, feeUsd: number, amount: number): string {
   const digits = p >= 0.1 ? 2 : Math.max(2, 1 - Math.floor(Math.log10(p || 1)));
   return iso(lang, new Intl.NumberFormat(NUM, { minimumFractionDigits: 2, maximumFractionDigits: Math.min(digits, 6) }).format(p) + '%');
 }
+
+// Patrick, 7 Nov 2026: a short paragraph of unique text on each indexed page (exchanges, compare, homepages), built from the data so it
+// stays true as fees move. Helpers below; the strings are the g.* keys in locales/*.json (Arabic self-written, for the translator).
+/** "A, B and C" / "A وB وC" */
+export function listJoin(lang: string, items: string[]): string {
+  if (lang === 'ar') return items.join(' و');
+  return items.length < 3 ? items.join(' and ') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+/** A Gulf licensing row that is a real authorisation (not an in-principle approval, a refusal or a "no regime" note) */
+export const isLicensed = (g: any) => /^(VASP licence|FSRA|Category \d|Virtual Asset Platform Operator licence)/.test(g.status || '');
+/** "{text} {link}" with the link where the string has {link} */
+export const splitLink = (s: string) => { const i = s.indexOf('{link}'); return i < 0 ? [s, ''] : [s.slice(0, i), s.slice(i + 6)]; };

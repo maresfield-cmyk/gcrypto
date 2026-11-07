@@ -1,15 +1,28 @@
 ---
 import Layout from '../../../components/Layout.astro';
-import { LANGS, t, fees, matrix, assetList, fmtNum, fmtDate } from '../../../data';
+import { LANGS, t, fees, matrix, assetList, fmtNum, fmtDate, fmtUsd, splitLink } from '../../../data';
 export const getStaticPaths = () => LANGS.flatMap((lang) => assetList().map((a) => ({ params: { lang, asset: a.id } })));
 const { lang, asset } = Astro.params;
 const F = fees(), M = matrix(), m = M.assets[asset], A = F.assets[asset];
 const L = (p: string) => `/${lang}${p}`;
 const exs = Object.entries(m.exchanges) as any[];
+// Patrick, 7 Nov 2026: a short unique paragraph from the data: the cheapest and dearest route for this asset right now, the network most
+// exchanges offer, the date of the last data check and a link to the methodology (stale exchanges and flagged cells left out)
+const routes = exs.flatMap(([, e]) => m.networks.map((n: string) => ({ e, n, c: e.cells[n] })))
+  .filter((x: any) => !x.e.stale && x.c && x.c.enabled && x.c.fee != null && x.c.fee_usd != null && !x.c.flags.length).sort((a: any, b: any) => a.c.fee_usd - b.c.fee_usd);
+const offered = m.networks.map((n: string) => ({ n, k: exs.filter(([, e]) => e.cells[n]?.enabled).length })).sort((a: any, b: any) => b.k - a.k)[0];
+const lo = routes[0], hi = routes[routes.length - 1], nm = (n: string) => F.networks[n]?.name ?? n;
+const summary = [
+  routes.length > 1 ? t(lang, 'compare.g_range', { asset: A.symbol, exchange: lo.e.name, network: nm(lo.n), fee: fmtNum(lang, lo.c.fee), usd: fmtUsd(lang, lo.c.fee_usd), exchange2: hi.e.name, network2: nm(hi.n), fee2: fmtNum(lang, hi.c.fee), usd2: fmtUsd(lang, hi.c.fee_usd) }) : '',
+  m.networks.length > 1 && offered && offered.k > 1 ? t(lang, 'compare.g_common', { asset: A.symbol, network: nm(offered.n), k: offered.k, n: exs.length }) : '',
+  t(lang, 'g.checked', { date: fmtDate(lang, M.generated_at) }),
+].filter(Boolean).join(' ');
+const [m1, m2] = splitLink(t(lang, 'g.method'));
 ---
 <Layout lang={lang} title={t(lang, 'compare.title', { asset: A.symbol })} description={t(lang, 'compare.description', { asset: A.symbol })} path={L(`/compare/${asset}-withdrawal-fees/`)} updated={M.generated_at} crumbs={[{ name: t(lang, 'compare.title', { asset: A.symbol }), path: L(`/compare/${asset}-withdrawal-fees/`) }]}>
   <div class="hero"><p class="eyebrow">{t(lang, 'nav.compare')} · {A.symbol}</p><h1>{t(lang, 'compare.h1', { asset: A.symbol })}</h1>
   <p class="lead">{t(lang, 'compare.intro', { asset: A.symbol })}</p>
+  <p class="lead">{summary} {m1}<a href={L('/methodology/')}>{t(lang, 'method.title')}</a>{m2}</p>
   <p class="meta">{t(lang, 'compare.other')}: {assetList().filter((a) => a.id !== asset).map((a) => <a href={L(`/compare/${a.id}-withdrawal-fees/`)} style="margin-inline-end:10px">{a.symbol}</a>)}</p></div>
   <div class="scroll"><table id="cmp"><thead><tr><th class="sortable" data-col="0">{t(lang, 'compare.exchange')}</th>{m.networks.map((n: string, i: number) => <th class="num sortable" data-col={i + 1}><a href={L(`/networks/${n}/`)}>{F.networks[n]?.name ?? n}</a></th>)}</tr></thead><tbody>
     {exs.map(([id, e]) => { const best = Math.min(...m.networks.map((n: string) => e.cells[n]?.enabled && e.cells[n].fee != null && !e.cells[n].flags.length ? e.cells[n].fee : Infinity)); return <tr><td><a href={L(`/exchanges/${id}/`)}>{e.name}</a>{e.stale && <span class="pill warn"> {e.note && /key/.test(e.note) ? 'not connected' : 'stale'}</span>}</td>{m.networks.map((n: string) => { const c = e.cells[n]; return <td class={'num' + (c && c.fee === best && c.enabled ? ' best' : '')} data-v={c && c.fee != null ? c.fee : ''} title={c?.check_overdue ? `${t(lang, 'ex.verified')}: ${fmtDate(lang, c.last_verified)}` : undefined}>{!c ? '–' : c.fee == null ? (c.pass_through ? <span class="meta">{t(lang, 'ex.network_fee')}</span> : '?') : <>{fmtNum(lang, c.fee)}{!c.enabled && <span class="pill bad"> {t(lang, 'ex.closed')}</span>}</>}</td>; })}</tr>; })}

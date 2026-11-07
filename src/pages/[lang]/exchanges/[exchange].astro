@@ -1,15 +1,37 @@
 ---
 import Layout from '../../../components/Layout.astro';
-import { LANGS, t, fees, exchanges, fmtNum, fmtDate, fmtUsd } from '../../../data';
+import { LANGS, t, fees, exchanges, fmtNum, fmtDate, fmtUsd, listJoin, isLicensed, splitLink } from '../../../data';
 export const getStaticPaths = () => LANGS.flatMap((lang) => Object.keys(exchanges().exchanges).map((exchange) => ({ params: { lang, exchange } })));
 const { lang, exchange } = Astro.params;
 const N = fees(), E = exchanges(), e = E.exchanges[exchange];
 const L = (p: string) => `/${lang}${p}`;
 const rows = [...e.rows].sort((a: any, b: any) => a.asset.localeCompare(b.asset) || (a.fee ?? 1e9) - (b.fee ?? 1e9));
 const noKey = e.note && /key/i.test(e.note);
+// Patrick, 7 Nov 2026: what is different about this exchange for Gulf users, from its own data (cheapest and dearest USDT network,
+// fee source, Gulf licences, local funding), the date of the last data check and a link to the methodology
+const nn = (r: any) => N.networks[r.network]?.name ?? r.network_name ?? r.network;
+const usdt = e.rows.filter((r: any) => r.asset === 'USDT' && r.withdraw_enabled && !(r.flags || []).length);
+const priced = usdt.filter((r: any) => r.fee != null && r.fee_usd != null).sort((a: any, b: any) => a.fee_usd - b.fee_usd);
+const pass = priced.length ? null : usdt.find((r: any) => r.pass_through);
+const lic = e.facts.gulf_licensing.filter(isLicensed).map((g: any) => (lang === 'ar' && g.region_ar ? g.region_ar : g.region));
+const fund = (e.facts.deposits || []).map((d: any) => `${d.ccy} (${d.methods.map((m: string) => t(lang, `funding.${m}`)).join(lang === 'ar' ? '، ' : ', ')})`);
+const handDates = e.rows.map((r: any) => r.last_verified).filter(Boolean).sort();
+const checked = e.fee_source === 'manual' && handDates.length ? handDates[0] : e.observed_at;
+const lo = priced[0], hi = priced[priced.length - 1];
+const gulf = [
+  priced.length > 1 ? t(lang, 'ex.g_range', { network: nn(lo), fee: fmtNum(lang, lo.fee), usd: fmtUsd(lang, lo.fee_usd), network2: nn(hi), fee2: fmtNum(lang, hi.fee), usd2: fmtUsd(lang, hi.fee_usd) })
+    : priced.length === 1 ? t(lang, 'ex.g_one', { network: nn(lo), fee: fmtNum(lang, lo.fee), usd: fmtUsd(lang, lo.fee_usd) })
+    : pass ? t(lang, 'ex.g_pass', { network: nn(pass) }) : '',
+  e.fee_source === 'api' ? t(lang, 'ex.g_api') : '',
+  lic.length ? t(lang, lic.length === 1 ? 'ex.g_lic1' : 'ex.g_licn', { list: listJoin(lang, lic) }) : t(lang, 'ex.g_nolic'),
+  fund.length ? t(lang, 'ex.g_fund', { list: listJoin(lang, fund) }) : '',
+  checked ? t(lang, 'g.checked', { date: fmtDate(lang, checked) }) : '',
+].filter(Boolean).join(' ');
+const [m1, m2] = splitLink(t(lang, 'g.method'));
 ---
 <Layout lang={lang} title={t(lang, 'ex.title', { exchange: e.name })} description={t(lang, 'ex.description', { exchange: e.name })} path={L(`/exchanges/${exchange}/`)} updated={E.generated_at} crumbs={[{ name: e.name, path: L(`/exchanges/${exchange}/`) }]}>
-  <div class="hero"><p class="eyebrow">{t(lang, 'nav.exchanges')} · {e.fee_source === 'api' ? 'API' : e.fee_source === 'api+manual' ? t(lang, 'ex.mixed') : t(lang, 'ex.verified')}</p><h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1></div>
+  <div class="hero"><p class="eyebrow">{t(lang, 'nav.exchanges')} · {e.fee_source === 'api' ? 'API' : e.fee_source === 'api+manual' ? t(lang, 'ex.mixed') : t(lang, 'ex.verified')}</p><h1>{t(lang, 'ex.h1', { exchange: e.name })}</h1>
+  <p class="lead gulf"><strong>{t(lang, 'ex.g_h2', { exchange: e.name })}</strong> {gulf} {m1}<a href={L('/methodology/')}>{t(lang, 'method.title')}</a>{m2}</p></div>
   {e.fee_source === 'page' && <p class="note">{t(lang, 'ex.page_note')} <a href={e.fee_page} rel="nofollow noopener" target="_blank">{t(lang, 'ex.fee_page')}</a></p>}
   {e.fee_source === 'manual' && <p class="note">{t(lang, 'ex.manual_note')} <a href={e.fee_page} rel="nofollow noopener" target="_blank">{t(lang, 'ex.fee_page')}</a></p>}
   {e.fee_source === 'api+manual' && <p class="note">{t(lang, 'ex.mixed_note')} <a href={e.fee_page} rel="nofollow noopener" target="_blank">{t(lang, 'ex.fee_page')}</a></p>}

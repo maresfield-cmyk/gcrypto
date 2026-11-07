@@ -9,6 +9,10 @@ const { lang, title, description, path, og, updated, crumbs = [], jsonld = [] } 
 // Search engines cut titles at about 60 characters: keep the site name only when the whole thing fits.
 const stripped = path.replace(/^\/[a-z]{2}(?=\/|$)/, '');
 const langPath = (l: string) => `/${l}${stripped}`;
+// Patrick, 7 Nov 2026: the template pages (history, networks, assets, calculator: 52 URLs) are noindex, follow; exchanges, compare,
+// the two homepages and methodology stay indexed. Not blocked in robots.txt (Google must crawl them to see the tag). They stay in the
+// sitemap for about two weeks so they are recrawled, then come out (astro.config.mjs filter).
+const noindex = /^\/[a-z]{2}\/(history|networks|assets|calculator)\//.test(path);
 const fullTitle = `${title} | ${t(lang, 'site.name')}`.length <= 60 ? `${title} | ${t(lang, 'site.name')}` : title;
 const L = (p: string) => `/${lang}${p}`;
 const NAV = [['/', 'nav.home'], ['/calculator/', 'nav.calculator'], ['/compare/usdt-withdrawal-fees/', 'nav.compare'], ['/history/', 'nav.history'], ['/methodology/', 'nav.methodology'], ['/embed/', 'nav.embed']];
@@ -21,6 +25,7 @@ const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList'
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{fullTitle}</title>
 <meta name="description" content={description}>
+{noindex && <meta name="robots" content="noindex, follow">}
 <link rel="canonical" href={`${SITE_URL}${path}`}>
 {LANGS.map((l) => <link rel="alternate" hreflang={l} href={`${SITE_URL}${langPath(l)}`} />)}<link rel="alternate" hreflang="x-default" href={`${SITE_URL}${langPath('en')}`}>
 <meta property="og:title" content={title}><meta property="og:description" content={description}><meta property="og:type" content="website"><meta property="og:url" content={`${SITE_URL}${path}`}>
