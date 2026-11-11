@@ -11,7 +11,7 @@ const stripped = path.replace(/^\/[a-z]{2}(?=\/|$)/, '');
 const langPath = (l: string) => `/${l}${stripped}`;
 // Patrick, 7 Nov 2026: the template pages (history, networks, assets, calculator: 52 URLs) are noindex, follow; exchanges, compare,
 // the two homepages and methodology stay indexed. Not blocked in robots.txt (Google must crawl them to see the tag). They stay in the
-// sitemap for about two weeks so they are recrawled, then come out (astro.config.mjs filter).
+// sitemap for about two weeks so they are recrawled; out of the sitemap since 11 Nov (astro.config.mjs filter, same rule).
 const noindex = /^\/[a-z]{2}\/(history|networks|assets|calculator)\//.test(path);
 const fullTitle = `${title} | ${t(lang, 'site.name')}`.length <= 60 ? `${title} | ${t(lang, 'site.name')}` : title;
 const L = (p: string) => `/${lang}${p}`;
