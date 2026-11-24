@@ -63,7 +63,18 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with: { path: dist }
       - name: Publish to GitHub Pages
+        id: publish
         if: ${{ hashFiles('dist/index.html') != '' }}
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      # Since 20 Nov GitHub's artifact list often still shows no "github-pages" artifact one second after the upload
+      # finished (deploy-pages then stops with 'No artifacts named "github-pages"'), and Pages now and then answers
+      # "Deployment failed, try again later". Both clear on their own, so wait 30 s and publish once more.
+      - name: Wait before the second try
+        if: ${{ steps.publish.outcome == 'failure' }}
+        run: sleep 30
+      - name: Publish to GitHub Pages (second try)
+        if: ${{ steps.publish.outcome == 'failure' }}
         uses: actions/deploy-pages@v4
       - name: Keep raw responses for 90 days
         uses: actions/upload-artifact@v4
